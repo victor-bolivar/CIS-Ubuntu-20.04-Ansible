@@ -553,7 +553,7 @@
         install_recommends: false
     - name: Configure default AIDE excludes file
       copy:
-        src: "files/1.4.1.txt"
+        src: "files/1_4_1.txt"
         dest: "/etc/aide/aide.conf.d/00_local_excludes"
     - name: Simplify AIDE checksums
       lineinfile:
