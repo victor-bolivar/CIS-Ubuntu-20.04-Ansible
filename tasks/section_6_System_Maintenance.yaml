@@ -6,7 +6,7 @@
   become: true
   block:
     - name: 6.1.1 Audit system file permissions
-      script: 6.1.1.sh
+      script: 6_1_1.sh
       register: output_6_1_1
     - name: 6.1.1 Audit system file permissions | save output to file
       copy:
@@ -271,7 +271,7 @@
 - name: 6.2.3 Ensure root PATH Integrity
   block:
     - name: 6.2.3 Ensure root PATH Integrity | run
-      script: 6.2.3.sh
+      script: 6_2_3.sh
       register: output_6_2_3
     - name: 6.2.3 Ensure root PATH Integrity | save output
       copy:
