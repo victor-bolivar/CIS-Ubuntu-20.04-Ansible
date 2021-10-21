@@ -1,4 +1,17 @@
 ---
+# Check default passwords have changed
+- block:
+    - name: "Exit: If check bootloader_credentials.password has not been changed"
+      fail:
+        msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
+  when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
+
+- block:
+    - name: "Exit: If check root_password has not been changed"
+      fail:
+        msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
+  when: set_root_password and root_password is match ("r00tP4ssw0rd")
+  
 # 1.1.1 Disable unused filesystems
 # 1.1.1.1 Ensure mounting of cramfs filesystems is disabled
 # Removing support for unneeded filesystem types reduces the local attack surface of the
@@ -614,14 +627,27 @@
 # Note: This recommendation is designed around the grub bootloader, if LILO or another
 # bootloader is in use in your environment enact equivalent settings. Replace
 # /boot/grub/grub.cfg with the appropriate grub configuration file for your environment.
+# Check default passwords have changed
+- block:
+    - name: If check bootloader_credentials.password has not been changed
+      fail:
+        msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
+    - meta: end_play
+  when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
+
 - name: 1.5.1 Ensure bootloader password is set
   block:
-    - name: 1.5.1 Ensure bootloader password is set - step 1 - check if it isn't already set up
+    - name: 1.5.1 Ensure bootloader password is set - step 1 - check bootloader_credentials.password has been changed
+      fail:
+        msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
+      when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
+
+    - name: 1.5.1 Ensure bootloader password is set - step 2 - check if it isn't already set up
       shell: /bin/grep -e "^[\s]*password" /boot/grub/grub.cfg | /usr/bin/awk '{print} END {if (NR == 0) print "continue" ; else print "stop"}'
       register: result
       ignore_errors: true
 
-    - name: 1.5.1 Ensure bootloader password is set - step 2 - create bootloader password hash
+    - name: 1.5.1 Ensure bootloader password is set - step 3 - create bootloader password hash
       # bash -c must be used in this strange way or mysterious errors are thrown
       shell: /bin/bash -c "echo -e '{{ bootloader_credentials.password }}\n{{ bootloader_credentials.password }}' | grub-mkpasswd-pbkdf2" | /bin/grep 'hash of your password' | /usr/bin/awk '{print $7}'
       register: password
@@ -630,7 +656,7 @@
         - bootloader_credentials.user
         - bootloader_credentials.password
 
-    - name: 1.5.1 Ensure bootloader password is set - step 3 - create custom grub configuration file
+    - name: 1.5.1 Ensure bootloader password is set - step 4 - create custom grub configuration file
       blockinfile:
         dest: /etc/grub.d/99_custom
         create: yes
@@ -682,6 +708,11 @@
 # manual selection from the bootloader.
 - name: 1.5.3 Ensure authentication required for single user mode
   block:
+    - name: 1.5.3 Ensure authentication required for single user mode - check root_password has been changed
+      fail:
+        msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
+      when: set_root_password and root_password is match ("r00tP4ssw0rd")
+
     - name: 1.5.3 Ensure authentication required for single user mode - check if a root password already exists
       shell: /bin/grep -e "^root:[\*]:" /etc/shadow | /usr/bin/awk 'END {if (NR != 0) print "continue" ; else print "stop"}'
       register: result
