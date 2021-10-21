@@ -379,6 +379,7 @@
       shell: |
         df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null
       register: worldWriteableList
+      ignore_errors: yes
     - name: 1.1.22 Ensure sticky bit is set on all world-writable directories | fix
       script: 1_1_22.sh
       when: worldWriteableList.stdout_lines |length > 0
