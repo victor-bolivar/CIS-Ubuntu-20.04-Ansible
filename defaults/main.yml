@@ -10,6 +10,7 @@ disable_hfsplus: yes
 disable_udf: yes
 disable_fat: yes
 temp_dir_size: 1G
+disable_squashfs: no #Disabling squashfs will prevent the use of snap
 ## 1.5.1 Ensure bootloader password is set (using grub): default is no
 set_bootloader_credentials: no
 ### Update the default bootloader user and password

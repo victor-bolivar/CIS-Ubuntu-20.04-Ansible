@@ -47,7 +47,7 @@ ansible-playbook -i host run.yaml --list-tags
 I wrote all roles based on
 ```Text
 CIS Ubuntu Linux 20.04 LTS Benchmark
-v1.0.0 - 07-21-2020
+v1.1.0 - 07-21-2020
 ```
 
 
