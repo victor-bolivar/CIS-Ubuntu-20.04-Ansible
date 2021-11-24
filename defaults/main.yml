@@ -121,11 +121,13 @@ allowd_hosts: "ALL: 0.0.0.0/0.0.0.0, 192.168.2.0/255.255.255.0"
 ssh_MACs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256"
 ## 5.2.14 Ensure only strong Key Exchange algorithms are used
 ssh_key_algorithms: "curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256"
+ssh_ciphers: chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
 ## 5.2.17 Ensure SSH access is limited
 allowed_users: ubuntu root #Put None or list of users space between each user
 allowed_groups: None
 deny_users: None
 deny_groups: None
+max_auth_tries: 4
 ## 5.2.21 Ensure SSH MaxStartups is configured
 ssh_max_startups: "10:30:100"
 ## 5.2.22 Ensure SSH MaxSessions is limited

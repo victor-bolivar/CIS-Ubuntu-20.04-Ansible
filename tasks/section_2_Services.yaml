@@ -95,7 +95,7 @@
         name: systemd-timesyncd.service
         enabled: yes
         state: started
-  when: "{{enable_systemdtimesyncd}} == True"
+  when: enable_systemdtimesyncd
   tags:
     - section2
     - level_1_server
@@ -121,7 +121,7 @@
         group: root
         mode: 0644
       notify: RestartChronyservice
-  when: "{{chronyEnable}} == True"
+  when: chronyEnable
   tags:
     - section2
     - level_1_server
@@ -202,7 +202,7 @@
     - level_1_server
     - level_2_workstation
     - 2.1.4
-# 2.1.5 Ensure DHCP Server is not
+# 2.1.5 Ensure DHCP Server is not installed
 # The Dynamic Host Configuration Protocol (DHCP) is a service that allows machines to be
 # dynamically assigned IP addresses.
 - name: 2.1.5 Ensure DHCP Server is not installed
