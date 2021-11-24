@@ -66,12 +66,13 @@ remove_AvahiServer: yes
 remove_CUPS: yes
 remove_DHCPServer: yes
 remove_LDAPserver: yes
-remove_NFS: yes
+remove_NFS: no
 remove_DNSServer: yes
 remove_FTPServer: yes
 remove_IMAPandPOP3server: yes
 remove_Samba: yes
 remove_HTTPProxyServer: yes
+HTTPProxyServer: squid
 remove_SNMPServer: yes
 remove_rsyncservice: yes
 remove_NISServer: yes
