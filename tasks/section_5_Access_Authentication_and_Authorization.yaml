@@ -135,9 +135,31 @@
     - level_1_server
     - level_1_workstation
     - 5.1.9
-# 5.2 Configure SSH Server
-# 5.2.1 Ensure permissions on /etc/ssh/sshd_config are configured
-- name: 5.2.1 Ensure permissions on /etc/ssh/sshd_config are configured
+
+# 5.2 Configure sudo
+# sudo allows a permitted user to execute a command as the superuser or another user,
+# as specified by the security policy. The invoking user's real (not effective)
+# user ID is used to determine the user name with which to query the security policy
+- name: 5.2.1 Ensure sudo is installed
+  apt:
+    name: sudo
+    state: present
+    install_recommends: false
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.2.1
+# - name: 5.2.2 Ensure sudo commands use pty
+# Edit the file /etc/sudoers or a file in /etc/sudoers.d/ with visudo -f and add the following line
+# Defaults use_pty
+# - name: 5.2.3 Ensure sudo log file exists
+# Edit the file /etc/sudoers or a file in /etc/sudoers.d/ with visudo -f and add the following line: and add the following line:
+# Defaults logfile="/var/log/sudo.log"
+
+# 5.3 Configure SSH Server
+# 5.3.1 Ensure permissions on /etc/ssh/sshd_config are configured
+- name: 5.3.1 Ensure permissions on /etc/ssh/sshd_config are configured
   file:
     dest: /etc/ssh/sshd_config
     state: file
@@ -148,15 +170,15 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.1
-# 5.2.2 Ensure permissions on SSH private host key files are configured
-- name: 5.2.2 Ensure permissions on SSH private host key files are configured
+    - 5.3.1
+# 5.3.2 Ensure permissions on SSH private host key files are configured
+- name: 5.3.2 Ensure permissions on SSH private host key files are configured
   block:
-    - name: 5.2.2 Ensure permissions on SSH private host key files are configured | find keys
+    - name: 5.3.2 Ensure permissions on SSH private host key files are configured | find keys
       shell: |
         find /etc/ssh -xdev -type f -name 'ssh_host_*_key'  && true || true
       register: private_keys
-    - name: 5.2.2 Ensure permissions on SSH private host key files are configured | fix permissions
+    - name: 5.3.2 Ensure permissions on SSH private host key files are configured | fix permissions
       file:
         dest: "{{ item }}"
         state: file
@@ -169,15 +191,15 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.2
-# 5.2.3 Ensure permissions on SSH public host key files are configured
-- name: 5.2.3 Ensure permissions on SSH public host key files are configured
+    - 5.3.2
+# 5.3.3 Ensure permissions on SSH public host key files are configured
+- name: 5.3.3 Ensure permissions on SSH public host key files are configured
   block:
-    - name: 5.2.3 Ensure permissions on SSH public host key files are configured | find keys
+    - name: 5.3.3 Ensure permissions on SSH public host key files are configured | find keys
       shell: |
         find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub' && true || true
       register: public_keys
-    - name: 5.2.3 Ensure permissions on SSH public host key files are configured | fix permissions
+    - name: 5.3.3 Ensure permissions on SSH public host key files are configured | fix permissions
       file:
         dest: "{{ item }}"
         state: file
@@ -190,187 +212,12 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.3
-# 5.2.4 Ensure SSH LogLevel is appropriate
-- name: 5.2.4 Ensure SSH LogLevel is appropriate
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^LogLevel"
-    line: "LogLevel INFO"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.4
-# 5.2.5 Ensure SSH X11 forwarding is disabled
-- name: 5.2.5 Ensure SSH X11 forwarding is disabled
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^X11Forwarding"
-    line: "X11Forwarding no"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.5
-# 5.2.6 Ensure SSH MaxAuthTries is set to 4 or less
-# Setting the MaxAuthTries parameter to a low number will minimize the risk of successful brute force attacks to the SSH server. While the recommended setting is 4, set the number based on site policy.
-- name: 5.2.6 Ensure SSH MaxAuthTries is set to 4 or less
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: '^(#)?MaxAuthTries \d'
-    line: "MaxAuthTries 4"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.6
-# 5.2.7 Ensure SSH IgnoreRhosts is enabled
-# Setting this parameter forces users to enter a password when authenticating with ssh.
-- name: 5.2.7 Ensure SSH IgnoreRhosts is enabled
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^IgnoreRhosts"
-    line: "IgnoreRhosts yes"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.7
-# 5.2.8 Ensure SSH HostbasedAuthentication is disabled
-# Even though the .rhosts files are ineffective if support is disabled in /etc/pam.conf ,disabling the ability to use .rhosts files in SSH provides an additional layer of protection.
-- name: 5.2.8 Ensure SSH HostbasedAuthentication is disabled
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^HostbasedAuthentication"
-    line: "HostbasedAuthentication no"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.8
-# 5.2.9 Ensure SSH root login is disabled
-# Disallowing root logins over SSH requires system admins to authenticate using their own individual account, then escalating to root via sudo or su . This in turn limits opportunity for non-repudiation and provides a clear audit trail in the event of a security incident
-- name: 5.2.9 Ensure SSH root login is disabled
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^PermitRootLogin"
-    line: "PermitRootLogin no"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.9
-# 5.2.10 Ensure SSH PermitEmptyPasswords is disabled
-# Disallowing remote shell access to accounts that have an empty password reduces the probability of unauthorized access to the system
-- name: 5.2.10 Ensure SSH PermitEmptyPasswords is disabled
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^PermitEmptyPasswords"
-    line: "PermitEmptyPasswords no"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.10
-# 5.2.11 Ensure SSH PermitUserEnvironment is disabled
-# Permitting users the ability to set environment variables through the SSH daemon could potentially allow users to bypass security controls (e.g. setting an execution path that has ssh executing trojan'd programs)
-- name: 5.2.11 Ensure SSH PermitUserEnvironment is disabled
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^PermitUserEnvironment"
-    line: "PermitUserEnvironment no"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.11
-# 5.2.12 Ensure only strong Ciphers are used
-# Weak ciphers that are used for authentication to the cryptographic module cannot be relied upon to provide confidentiality or integrity, and system data may be compromised
-- name: 5.2.12 Ensure only strong Ciphers are used
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^Ciphers"
-    line: "Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.12
-# 5.2.13 Ensure only strong MAC algorithms are used
-# MD5 and 96-bit MAC algorithms are considered weak and have been shown to increase exploitability in SSH downgrade attacks. Weak algorithms continue to have a great deal of attention as a weak spot that can be exploited with expanded computing power. An attacker that breaks the algorithm could take advantage of a MiTM position to decrypt the SSH tunnel and capture credentials and information
-- name: 5.2.13 Ensure only strong MAC algorithms are used
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^MACs"
-    line: "MACs {{ ssh_MACs }}"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.13
-# 5.2.14 Ensure only strong Key Exchange algorithms are used
-# Key exchange methods that are considered weak should be removed. A key exchange method may be weak because too few bits are used, or the hashing algorithm is considered too weak. Using weak algorithms could expose connections to man-in-the-middle attacks
-- name: 5.2.14 Ensure only strong Key Exchange algorithms are used
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^KexAlgorithms"
-    line: "KexAlgorithms {{ ssh_key_algorithms }}"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.14
-# 5.2.15 Ensure SSH Idle Timeout Interval is configured
-# Having no timeout value associated with a connection could allow an unauthorized user access to another user's ssh session (e.g. user walks away from their computer and doesn't lock the screen). Setting a timeout value reduces this risk.
-- name: 5.2.15 Ensure SSH Idle Timeout Interval is configured
-  block:
-    - name: 5.2.15 Ensure SSH Idle Timeout Interval is configured | clientalive
-      lineinfile:
-        state: present
-        dest: /etc/ssh/sshd_config
-        regexp: "^ClientAliveInterval"
-        line: "ClientAliveInterval 300"
-    - name: 5.2.15 Ensure SSH Idle Timeout Interval is configured | MaxAlive
-      lineinfile:
-        state: present
-        dest: /etc/ssh/sshd_config
-        regexp: "^ClientAliveCountMax"
-        line: "ClientAliveCountMax 3"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.15
-# 5.2.16 Ensure SSH LoginGraceTime is set to one minute or less
-# Setting the LoginGraceTime parameter to a low number will minimize the risk of successful brute force attacks to the SSH server. It will also limit the number of concurrent unauthenticated connections While the recommended setting is 60 seconds (1 Minute), set the number based on site policy.
-- name: 5.2.16 Ensure SSH LoginGraceTime is set to one minute or less
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^LoginGraceTime"
-    line: "LoginGraceTime 60"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.2.16
-# 5.2.17 Ensure SSH access is limited
+    - 5.3.3
+# 5.3.4 Ensure SSH access is limited
 # Restricting which users can remotely access the system via SSH will help ensure that only authorized users access the system.
-- name: 5.2.17 Ensure SSH access is limited
+- name: 5.3.4 Ensure SSH access is limited
   block:
-    - name: 5.2.17 Ensure SSH access is limited | allow users
+    - name: 5.3.4 Ensure SSH access is limited | allow users
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -378,7 +225,7 @@
         line: "AllowUsers {{ allowed_users }}"
       when:
         - "{{ allowed_users|length > 0 }}"
-    - name: 5.2.17 Ensure SSH access is limited | allow groups
+    - name: 5.3.4 Ensure SSH access is limited | allow groups
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -386,7 +233,7 @@
         line: "AllowGroups {{ allowed_groups }}"
       when:
         - allowed_groups != "None"
-    - name: 5.2.17 Ensure SSH access is limited | denyusers
+    - name: 5.3.4 Ensure SSH access is limited | denyusers
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -394,7 +241,7 @@
         line: "DenyUsers {{ deny_users }}"
       when:
         - deny_users != "None"
-    - name: 5.2.17 Ensure SSH access is limited | denygroups
+    - name: 5.3.4 Ensure SSH access is limited | denygroups
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -406,10 +253,186 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.17
-# 5.2.18 Ensure SSH warning banner is configured
+    - 5.3.4
+# 5.3.5 Ensure SSH LogLevel is appropriate
+- name: 5.3.5 Ensure SSH LogLevel is appropriate
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^LogLevel"
+    line: "LogLevel INFO"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.5
+# 5.3.6 Ensure SSH X11 forwarding is disabled
+- name: 5.3.6 Ensure SSH X11 forwarding is disabled
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^X11Forwarding"
+    line: "X11Forwarding no"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.6
+# 5.3.7 Ensure SSH MaxAuthTries is set to 4 or less
+# Setting the MaxAuthTries parameter to a low number will minimize the risk of successful brute force attacks to the SSH server. While the recommended setting is 4, set the number based on site policy.
+- name: 5.3.7 Ensure SSH MaxAuthTries is set to 4 or less
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^(#)?MaxAuthTries \d'
+    line: "MaxAuthTries 4"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.7
+# 5.3.8 Ensure SSH IgnoreRhosts is enabled
+# Setting this parameter forces users to enter a password when authenticating with ssh.
+- name: 5.3.8 Ensure SSH IgnoreRhosts is enabled
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^IgnoreRhosts"
+    line: "IgnoreRhosts yes"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.8
+# 5.3.9 Ensure SSH HostbasedAuthentication is disabled
+# Even though the .rhosts files are ineffective if support is disabled in /etc/pam.conf ,disabling the ability to use .rhosts files in SSH provides an additional layer of protection.
+- name: 5.3.9 Ensure SSH HostbasedAuthentication is disabled
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^HostbasedAuthentication"
+    line: "HostbasedAuthentication no"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.9
+# 5.3.10 Ensure SSH root login is disabled
+# Disallowing root logins over SSH requires system admins to authenticate using their own individual account, then escalating to root via sudo or su . This in turn limits opportunity for non-repudiation and provides a clear audit trail in the event of a security incident
+- name: 5.3.10 Ensure SSH root login is disabled
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.10
+# 5.3.11 Ensure SSH PermitEmptyPasswords is disabled
+# Disallowing remote shell access to accounts that have an empty password reduces the probability of unauthorized access to the system
+- name: 5.3.11 Ensure SSH PermitEmptyPasswords is disabled
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitEmptyPasswords"
+    line: "PermitEmptyPasswords no"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.11
+# 5.3.12 Ensure SSH PermitUserEnvironment is disabled
+# Permitting users the ability to set environment variables through the SSH daemon could potentially allow users to bypass security controls (e.g. setting an execution path that has ssh executing trojan'd programs)
+- name: 5.3.12 Ensure SSH PermitUserEnvironment is disabled
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitUserEnvironment"
+    line: "PermitUserEnvironment no"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.12
+# 5.3.13 Ensure only strong Ciphers are used
+# Weak ciphers that are used for authentication to the cryptographic module cannot be relied upon to provide confidentiality or integrity, and system data may be compromised
+- name: 5.3.13 Ensure only strong Ciphers are used
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^Ciphers"
+    line: "Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.13
+# 5.3.14 Ensure only strong MAC algorithms are used
+# MD5 and 96-bit MAC algorithms are considered weak and have been shown to increase exploitability in SSH downgrade attacks. Weak algorithms continue to have a great deal of attention as a weak spot that can be exploited with expanded computing power. An attacker that breaks the algorithm could take advantage of a MiTM position to decrypt the SSH tunnel and capture credentials and information
+- name: 5.3.14 Ensure only strong MAC algorithms are used
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^MACs"
+    line: "MACs {{ ssh_MACs }}"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.14
+# 5.3.15 Ensure only strong Key Exchange algorithms are used
+# Key exchange methods that are considered weak should be removed. A key exchange method may be weak because too few bits are used, or the hashing algorithm is considered too weak. Using weak algorithms could expose connections to man-in-the-middle attacks
+- name: 5.3.15 Ensure only strong Key Exchange algorithms are used
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^KexAlgorithms"
+    line: "KexAlgorithms {{ ssh_key_algorithms }}"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.15
+# 5.3.16 Ensure SSH Idle Timeout Interval is configured
+# Having no timeout value associated with a connection could allow an unauthorized user access to another user's ssh session (e.g. user walks away from their computer and doesn't lock the screen). Setting a timeout value reduces this risk.
+- name: 5.3.16 Ensure SSH Idle Timeout Interval is configured
+  block:
+    - name: 5.3.16 Ensure SSH Idle Timeout Interval is configured | clientalive
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^ClientAliveInterval"
+        line: "ClientAliveInterval 300"
+    - name: 5.3.16 Ensure SSH Idle Timeout Interval is configured | MaxAlive
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^ClientAliveCountMax"
+        line: "ClientAliveCountMax 3"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.16
+# 5.3.17 Ensure SSH LoginGraceTime is set to one minute or less
+# Setting the LoginGraceTime parameter to a low number will minimize the risk of successful brute force attacks to the SSH server. It will also limit the number of concurrent unauthenticated connections While the recommended setting is 60 seconds (1 Minute), set the number based on site policy.
+- name: 5.3.17 Ensure SSH LoginGraceTime is set to one minute or less
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: "^LoginGraceTime"
+    line: "LoginGraceTime 60"
+  tags:
+    - section5
+    - level_1_server
+    - level_1_workstation
+    - 5.3.17
+
+# 5.3.18 Ensure SSH warning banner is configured
 # Banners are used to warn connecting users of the particular site's policy regarding connection. Presenting a warning message prior to the normal user login may assist the prosecution of trespassers on the computer system.
-- name: 5.2.18 Ensure SSH warning banner is configured
+- name: 5.3.18 Ensure SSH warning banner is configured
   lineinfile:
     state: present
     dest: /etc/ssh/sshd_config
@@ -419,10 +442,10 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.18
-# 5.2.19 Ensure SSH PAM is enabled
+    - 5.3.18
+# 5.3.19 Ensure SSH PAM is enabled
 # When usePAM is set to yes, PAM runs through account and session types properly. This is important if you want to restrict access to services based off of IP, time or other factors of the account. Additionally, you can make sure users inherit certain environment variables on login or disallow access to the server
-- name: 5.2.19 Ensure SSH PAM is enabled
+- name: 5.3.19 Ensure SSH PAM is enabled
   lineinfile:
     state: present
     dest: /etc/ssh/sshd_config
@@ -432,10 +455,10 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.19
-# 5.2.20 Ensure SSH AllowTcpForwarding is disabled
+    - 5.3.19
+# 5.3.20 Ensure SSH AllowTcpForwarding is disabled
 # Leaving port forwarding enabled can expose the organization to security risks and back- doors.
-- name: 5.2.20 Ensure SSH AllowTcpForwarding is disabled
+- name: 5.3.20 Ensure SSH AllowTcpForwarding is disabled
   lineinfile:
     state: present
     dest: /etc/ssh/sshd_config
@@ -445,10 +468,10 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.20
-# 5.2.21 Ensure SSH MaxStartups is configured
+    - 5.3.20
+# 5.3.21 Ensure SSH MaxStartups is configured
 # To protect a system from denial of service due to a large number of pending authentication connection attempts, use the rate limiting function of MaxStartups to protect availability of sshd logins and prevent overwhelming the daemon.
-- name: "5.2.21 Ensure SSH MaxStartups is configured to {{ ssh_max_startups }}"
+- name: "5.3.21 Ensure SSH MaxStartups is configured to {{ ssh_max_startups }}"
   lineinfile:
     state: present
     dest: /etc/ssh/sshd_config
@@ -458,10 +481,10 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.21
-# 5.2.22 Ensure SSH MaxSessions is limited
+    - 5.3.21
+# 5.3.22 Ensure SSH MaxSessions is limited
 # To protect a system from denial of service due to a large number of concurrent sessions, use the rate limiting function of MaxSessions to protect availability of sshd logins and prevent overwhelming the daemon.
-- name: "5.2.22 Ensure SSH MaxSessions is limited to {{ ssh_max_sessions }}"
+- name: "5.3.22 Ensure SSH MaxSessions is limited to {{ ssh_max_sessions }}"
   lineinfile:
     state: present
     dest: /etc/ssh/sshd_config
@@ -471,18 +494,18 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.2.21
-# 5.3 Configure PAM
-# 5.3.1 Ensure password creation requirements are configured
+    - 5.3.21
+# 5.4 Configure PAM
+# 5.4.1 Ensure password creation requirements are configured
 # Strong passwords protect systems from being hacked through brute force methods.
-- name: 5.3.1 Ensure password creation requirements are configured
+- name: 5.4.1 Ensure password creation requirements are configured
   block:
-    - name: 5.3.1 Ensure password creation requirements are configured
+    - name: 5.4.1 Ensure password creation requirements are configured
       apt:
         name: libpam-pwquality
         state: present
         install_recommends: false
-    - name: 5.3.1 Ensure password creation requirements are configured
+    - name: 5.4.1 Ensure password creation requirements are configured
       lineinfile:
         state: present
         create: yes
@@ -499,21 +522,21 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.3.1
-# 5.3.2 Ensure lockout for failed password attempts is configured
+    - 5.4.1
+# 5.4.2 Ensure lockout for failed password attempts is configured
 # Locking out user IDs after n unsuccessful consecutive login attempts mitigates brute force password attacks against your systems.
-- name: 5.3.2 Ensure lockout for failed password attempts is configured
+- name: 5.4.2 Ensure lockout for failed password attempts is configured
   block:
-    - name: 5.3.2 Ensure lockout for failed password attempts is configured | common-auth
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | common-auth
       lineinfile:
         dest: /etc/pam.d/common-auth
         line: "auth required pam_tally2.so onerr=fail audit silent deny=5 unlock_time=900"
-    - name: 5.3.2 Ensure lockout for failed password attempts is configured | pam_deny.so
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_deny.so
       lineinfile:
         dest: /etc/pam.d/common-account
         regexp: '^account\srequisite'
         line: "account requisite pam_deny.so"
-    - name: 5.3.2 Ensure lockout for failed password attempts is configured | pam_tally2.so
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_tally2.so
       lineinfile:
         dest: /etc/pam.d/common-account
         regexp: '^account\srequired'
@@ -522,10 +545,10 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.3.2
-# 5.3.3 Ensure password reuse is limited
+    - 5.4.2
+# 5.4.3 Ensure password reuse is limited
 # Locking out user IDs after n unsuccessful consecutive login attempts mitigates brute force password attacks against your systems.
-- name: 5.3.3 Ensure password reuse is limited
+- name: 5.4.3 Ensure password reuse is limited
   lineinfile:
     dest: /etc/pam.d/common-password
     line: "password required pam_pwhistory.so remember=5"
@@ -533,10 +556,10 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.3.3
-# 5.3.4 Ensure password hashing algorithm is SHA-512
+    - 5.4.3
+# 5.4.4 Ensure password hashing algorithm is SHA-512
 # The SHA-512 algorithm provides much stronger hashing than MD5, thus providing additional protection to the system by increasing the level of effort for an attacker to successfully determine passwords.
-- name: 5.3.4 Ensure password hashing algorithm is SHA-512
+- name: 5.4.4 Ensure password hashing algorithm is SHA-512
   lineinfile:
     dest: /etc/pam.d/common-password
     regexp: '^password\s+\[success'
@@ -545,52 +568,57 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.3.4
-# 5.4 User Accounts and Environment
-# 5.4.1 Set Shadow Password Suite Parameters
+    - 5.4.4
+# 5.5 User Accounts and Environment
+# 5.5.1 Set Shadow Password Suite Parameters
 # # # The window of opportunity for an attacker to leverage compromised credentials or successfully compromise credentials via an online brute force attack is limited by the age of the password. Therefore, reducing the maximum age of a password also reduces an attacker's window of opportunity.
-- name: 5.4.1 Set Shadow Password Suite Parameters
-  lineinfile:
-    dest: /etc/pam.d/common-password
-    regexp: '^password\s+\[success'
-    line: "password [success=1 default=ignore] pam_unix.so sha512"
-  tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.4.1
-# 5.4.1.1 Ensure password expiration is 365 days or less
-# 5.4.1.2 Ensure minimum days between password changes is configured
-# 5.4.1.3 Ensure password expiration warning days is 7 or more
-- name: "5.4.1.1 Ensure password expiration is 365 days or less\n
-         5.4.1.2 Ensure minimum days between password changes is configured\n
-         5.4.1.3 Ensure password expiration warning days is 7 or more"
+# - name: 5.5.1 Set Shadow Password Suite Parameters
+#   lineinfile:
+#     dest: /etc/pam.d/common-password
+#     regexp: '^password\s+\[success'
+#     line: "password [success=1 default=ignore] pam_unix.so sha512"
+#   tags:
+#     - section5
+#     - level_1_server
+#     - level_1_workstation
+#     - 5.5.1
+# 5.5.1.1 Ensure password expiration is 365 days or less
+# 5.5.1.1 Ensure minimum days between password changes is configured
+# 5.5.1.3 Ensure password expiration warning days is 7 or more
+- name: "5.5.1.1 Ensure minimum days between password changes is configured\n
+    5.5.1.2 Ensure password expiration is 365 days or less\n
+    5.5.1.3 Ensure password expiration warning days is 7 or more"
   block:
-    - name: 5.4.1.1 Ensure password expiration is 365 days or less | PASS_MAX_DAYS
-      lineinfile:
-        state: present
-        dest: /etc/login.defs
-        regexp: "^PASS_MAX_DAYS"
-        line: "PASS_MAX_DAYS {{ pass_expire_in_days }}"
-    - name: 5.4.1.1 Ensure password expiration is 365 days or less | PASS_MIN_DAYS
+    - name: 5.5.1.1 Ensure minimum days between password changes is configured | PASS_MIN_DAYS
       lineinfile:
         state: present
         dest: /etc/login.defs
         regexp: "^PASS_MIN_DAYS"
         line: "PASS_MIN_DAYS {{ pass_min_days }}"
-    - name: 5.4.1.1 Ensure password expiration is 365 days or less | PASS_WARN_AGE
+
+    - name: 5.5.1.2 Ensure password expiration is 365 days or less | PASS_MAX_DAYS
+      lineinfile:
+        state: present
+        dest: /etc/login.defs
+        regexp: "^PASS_MAX_DAYS"
+        line: "PASS_MAX_DAYS {{ pass_expire_in_days }}"
+
+    - name: 5.5.1.3 Ensure password expiration warning days is 7 or more | PASS_WARN_AGE
       lineinfile:
         state: present
         dest: /etc/login.defs
         regexp: "^PASS_WARN_AGE"
         line: "PASS_WARN_AGE {{ pass_warn_age }}"
-    - name: 5.4.1.1 Ensure password expiration is 365 days or less | chage
+
+    - name: 5.5.1.2 Ensure password expiration is 365 days or less  | chage
       command: "chage --maxdays {{ pass_expire_in_days }} {{ item }}"
       with_items: "{{ list_of_os_users }}"
-    - name: 5.4.1.1 Ensure password expiration is 365 days or less | chage --mindays
+
+    - name: 5.5.1.1 Ensure minimum days between password changes is configured  | chage --mindays
       command: "chage --mindays {{ pass_min_days }} {{ item }}"
       with_items: "{{ list_of_os_users }}"
-    - name: 5.4.1.1 Ensure password expiration is 365 days or less | chage --warndays
+
+    - name: 5.5.1.3 Ensure password expiration warning days is 7 or more  | chage --warndays
       command: "chage --warndays {{ pass_warn_age }} {{ item }}"
       with_items: "{{ list_of_os_users }}"
   ignore_errors: yes
@@ -598,15 +626,15 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.4.1.1
-    - 5.4.1.2
-    - 5.4.1.3
-# 5.4.1.4 Ensure inactive password lock is 30 days or less
-- name: 5.4.1.4 Ensure inactive password lock is 30 days or less
+    - 5.5.1.1
+    - 5.5.1.2
+    - 5.5.1.3
+# 5.5.1.4 Ensure inactive password lock is 30 days or less
+- name: 5.5.1.4 Ensure inactive password lock is 30 days or less
   block:
-    - name: 5.4.1.4 Ensure inactive password lock is 30 days or less | useradd
+    - name: 5.5.1.4 Ensure inactive password lock is 30 days or less | useradd
       command: "useradd -D -f {{ account_inactive }}"
-    - name: 5.4.1.4 Ensure inactive password lock is 30 days or less | useradd
+    - name: 5.5.1.4 Ensure inactive password lock is 30 days or less | useradd
       command: "chage --inactive {{ account_inactive }} {{ item }}"
       with_items: "{{ list_of_os_users }}"
   ignore_errors: yes
@@ -614,12 +642,12 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.4.1.4
-# 5.4.1.5 Ensure all users last password change date is in the past
+    - 5.5.1.4
+# 5.5.1.5 Ensure all users last password change date is in the past
 # Investigate any users with a password change date in the future and correct them. Locking the account, expiring the password, or resetting the password manually may be appropriate.
-- name: 5.4.1.5 Ensure all users last password change date is in the past
+- name: 5.5.1.5 Ensure all users last password change date is in the past
   block:
-    - name: 5.4.1.5 Ensure all users last password change date is in the past | get list
+    - name: 5.5.1.5 Ensure all users last password change date is in the past | get list
       shell: |
         awk -F: '{print $1}' /etc/shadow | while read -r user
         do
@@ -628,20 +656,20 @@
           fi
         done
       register: output_5_4_1_5
-    - name: 5.4.1.5 Ensure all users last password change date is in the past | save list
+    - name: 5.5.1.5 Ensure all users last password change date is in the past | save list
       copy:
-        dest: "{{ outputfiles }}/5.4.1.5"
+        dest: "{{ outputfiles }}/5.5.1.5"
         content: "{{ output_5_4_1_5.stdout_lines }}"
   tags:
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.4.1.5
+    - 5.5.1.5
     - manual
-# 5.4.2 Ensure system accounts are secured
-- name: 5.4.2 Ensure system accounts are secured
+# 5.5.2 Ensure system accounts are secured
+- name: 5.5.2 Ensure system accounts are secured
   block:
-    - name: 5.4.2 Ensure system accounts are secured | set all system accounts to a non login shell
+    - name: 5.5.2 Ensure system accounts are secured | set all system accounts to a non login shell
       shell: |
         for user in `awk -F: '($3 < 1000) {print $1 }' /etc/passwd`; do
         if [ $user != "root" ]; then
@@ -656,47 +684,47 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.4.2
-# 5.4.3 Ensure default group for the root account is GID 0
+    - 5.5.2
+# 5.5.3 Ensure default group for the root account is GID 0
 # Using GID 0 for the root account helps prevent root -owned files from accidentally becoming accessible to non-privileged users.
-- name: 5.4.3 Ensure default group for the root account is GID 0
+- name: 5.5.3 Ensure default group for the root account is GID 0
   command: usermod -g 0 root
   tags:
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.4.3
-# 5.4.4 Ensure default user umask is 027 or more restrictive
+    - 5.5.3
+# 5.5.4 Ensure default user umask is 027 or more restrictive
 # # # # Setting a very secure default value for umask ensures that users make a conscious choice about their file permissions. A default umask setting of 077 causes files and directories created by users to not be readable by any other user on the system. A umask of 027 would make files and directories readable by users in the same Unix group, while a umask of 022 would make files readable by every user on the system.
-- name: 5.4.4 Ensure default user umask is 027 or more restrictive
+- name: 5.5.4 Ensure default user umask is 027 or more restrictive
   block:
-    - name: 5.4.4 Ensure default user umask is 027 or more restrictive | /etc/login.defs
+    - name: 5.5.4 Ensure default user umask is 027 or more restrictive | /etc/login.defs
       lineinfile:
         state: present
         dest: /etc/login.defs
         regexp: '^UMASK\s'
         line: "UMASK 027"
         mode: "0666"
-    - name: 5.4.4 Ensure default user umask is 027 or more restrictive  | /etc/pam.d/common-session
+    - name: 5.5.4 Ensure default user umask is 027 or more restrictive  | /etc/pam.d/common-session
       lineinfile:
         dest: /etc/pam.d/common-session
         regexp: '^session optional\s+'
         line: "session optional  pam_umask.so"
-    - name: 5.4.4 Ensure default user umask is 027 or more restrictive - /etc/bash.bashrc
+    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - /etc/bash.bashrc
       lineinfile:
         state: present
         dest: /etc/bash.bashrc
         create: true
         regexp: "^umask "
         line: "umask 027"
-    - name: 5.4.4 Ensure default user umask is 027 or more restrictive - /etc/profile
+    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - /etc/profile
       lineinfile:
         state: present
         dest: /etc/profile
         create: true
         regexp: "^umask "
         line: "umask 027"
-    - name: 5.4.4 Ensure default user umask is 027 or more restrictive - /etc/profile.d/umask.sh
+    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - /etc/profile.d/umask.sh
       lineinfile:
         state: present
         dest: /etc/profile.d/umask.sh
@@ -707,26 +735,26 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.4.4
-# 5.4.5 Ensure default user shell timeout is 900 seconds or less
+    - 5.5.4
+# 5.5.5 Ensure default user shell timeout is 900 seconds or less
 # # Setting a timeout value reduces the window of opportunity for unauthorized user access to another user's shell session that has been left unattended. It also ends the inactive session and releases the resources associated with that session
-- name: 5.4.5 Ensure default user shell timeout is 900 seconds or less
+- name: 5.5.5 Ensure default user shell timeout is 900 seconds or less
   block:
-    - name: 5.4.5 Ensure default user shell timeout is 900 seconds or less | /etc/bash.bashrc
+    - name: 5.5.5 Ensure default user shell timeout is 900 seconds or less | /etc/bash.bashrc
       lineinfile:
         state: present
         dest: /etc/bash.bashrc
         create: true
         regexp: "^TMOUT="
         line: "TMOUT={{ shell_timeout_sec }} ; export TMOUT"
-    - name: 5.4.5 Ensure default user shell timeout is 900 seconds or less | /etc/profile
+    - name: 5.5.5 Ensure default user shell timeout is 900 seconds or less | /etc/profile
       lineinfile:
         state: present
         dest: /etc/profile
         create: true
         regexp: "^TMOUT="
         line: "TMOUT={{ shell_timeout_sec }} ; export TMOUT"
-    - name: 5.4.5 Ensure default user shell timeout is 900 seconds or less | /etc/profile.d/timeout.sh
+    - name: 5.5.5 Ensure default user shell timeout is 900 seconds or less | /etc/profile.d/timeout.sh
       lineinfile:
         state: present
         dest: /etc/profile.d/tmout.sh
@@ -737,38 +765,38 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.4.5
-# 5.5 Ensure root login is restricted to system console
+    - 5.5.5
+# 5.6 Ensure root login is restricted to system console
 # Since the system console has special properties to handle emergency situations, it is important to ensure that the console is in a physically secure location and that unauthorized consoles have not been defined.
-- name: 5.5 Ensure root login is restricted to system console
+- name: 5.6 Ensure root login is restricted to system console
   block:
-    - name: 5.5 Ensure root login is restricted to system console | check file
+    - name: 5.6 Ensure root login is restricted to system console | check file
       stat:
         path: /etc/securetty
       register: securetty
-    - name: 5.5 Ensure root login is restricted to system console | save output
+    - name: 5.6 Ensure root login is restricted to system console | save output
       copy:
-        dest: "{{ outputfiles }}/5.5"
+        dest: "{{ outputfiles }}/5.6"
         content: "{{ securetty }}"
   ignore_errors: yes
   tags:
     - section5
     - level_1_server
     - level_1_workstation
-    - _5.5
+    - _5.6
     - manual
-# 5.6 Ensure access to the su command is restricted
+# 5.7 Ensure access to the su command is restricted
 # Restricting the use of su , and using sudo in its place, provides system administrators better control of the escalation of user privileges to execute privileged commands. The sudo utility also provides a better logging and audit mechanism, as it can log each command executed via sudo , whereas su can only record that a user executed the su program.
-- name: 5.6 Ensure access to the su command is restricted
+- name: 5.7 Ensure access to the su command is restricted
   block:
-    - name: 5.6 Ensure access to the su command is restricted  | create su-group-access
+    - name: 5.7 Ensure access to the su command is restricted  | create su-group-access
       template:
         src: files/templates/etc/su-group-access.j2
         dest: "/etc/security/su-group-access"
         owner: root
         group: root
         mode: 0644
-    - name: 5.6 Ensure access to the su command is restricted  | create pam-d-su
+    - name: 5.7 Ensure access to the su command is restricted  | create pam-d-su
       template:
         src: files/templates/etc/pam-d-su.j2
         dest: "/etc/pam.d/su"
@@ -779,4 +807,4 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - "5.6"
+    - "5.7"
