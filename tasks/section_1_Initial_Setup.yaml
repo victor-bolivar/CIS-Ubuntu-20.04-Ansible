@@ -1,16 +1,16 @@
 ---
 # Check default passwords have changed
-- block:
-    - name: "Exit: If check bootloader_credentials.password has not been changed"
-      fail:
-        msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
-  when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
+# - block:
+#     - name: "Exit: If check bootloader_credentials.password has not been changed"
+#       fail:
+#         msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
+#   when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
 
-- block:
-    - name: "Exit: If check root_password has not been changed"
-      fail:
-        msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
-  when: set_root_password and root_password is match ("r00tP4ssw0rd")
+# - block:
+#     - name: "Exit: If check root_password has not been changed"
+#       fail:
+#         msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
+#   when: set_root_password and root_password is match ("r00tP4ssw0rd")
   
 # 1.1.1 Disable unused filesystems
 # 1.1.1.1 Ensure mounting of cramfs filesystems is disabled
@@ -749,10 +749,12 @@
       register: result
       ignore_errors: true
 
+  rescue:
     - name: 1.4.4 Ensure authentication required for single user mode - create a root password
-      # bash must be used or mysterious errors are thrown
-      shell: /bin/bash -c "echo -e '{{ root_password }}\n{{ root_password }}' | passwd root"
-      when: result.stdout == "continue"
+      user: 
+        name: root 
+        update_password: always 
+        password: "{{root_password | password_hash('sha512')}}"
   when: set_root_password and root_password
   tags:
     - section1
