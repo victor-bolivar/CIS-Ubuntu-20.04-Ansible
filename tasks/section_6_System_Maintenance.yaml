@@ -345,7 +345,7 @@
     - name: 6.2.6 Ensure users home directories permissions are 750 or more restrictive - list
       script: 6_2_5.sh
       register: output_6_2_5
-    - name: 6.2.6 Ensure users' home directories permissions are 750 or more restrictive - save
+    - name: 6.2.6 Ensure users' home directories permissions are 750 or more restrictive - print output
       copy:
         dest: "{{ outputfiles }}/6.2.6"
         content: "{{ output_6_2_5.stdout_lines }}"

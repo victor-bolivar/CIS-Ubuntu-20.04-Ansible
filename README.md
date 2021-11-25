@@ -483,6 +483,15 @@ TASK [CIS-Ubuntu-20.04-Ansible : 5.4.1.1 Ensure password expiration is 365 days 
 ```
 * Make sure you set the right user under defaults/main.yaml
 
+
+```
+
+TASK [CIS-Ubuntu-20.04-Ansible : Creating users without admin access] ***************************************************************************************************************
+fatal: [golden]: FAILED! => {"msg": "crypt.crypt not supported on Mac OS X/Darwin, install passlib python module"}
+```
+
+Install `pip install passlib`
+
 _________________
 
 
