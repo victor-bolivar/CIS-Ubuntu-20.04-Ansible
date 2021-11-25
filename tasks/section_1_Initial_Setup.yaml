@@ -1,16 +1,16 @@
 ---
 # Check default passwords have changed
-- block:
-    - name: "Exit: If check bootloader_credentials.password has not been changed"
-      fail:
-        msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
-  when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
+# - block:
+#     - name: "Exit: If check bootloader_credentials.password has not been changed"
+#       fail:
+#         msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
+#   when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
 
-- block:
-    - name: "Exit: If check root_password has not been changed"
-      fail:
-        msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
-  when: set_root_password and root_password is match ("r00tP4ssw0rd")
+# - block:
+#     - name: "Exit: If check root_password has not been changed"
+#       fail:
+#         msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
+#   when: set_root_password and root_password is match ("r00tP4ssw0rd")
   
 # 1.1.1 Disable unused filesystems
 # 1.1.1.1 Ensure mounting of cramfs filesystems is disabled
@@ -62,7 +62,7 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.1.1.2
+    - "1.1.1.2"
     - filesystems
     - freevxfs
     - modprobe
@@ -141,21 +141,47 @@
     - filesystems
     - hfsplus
     - modprobe
-# 1.1.1.6 Ensure mounting of udf filesystems is disabled
+# 1.1.1.6 Ensure mounting of squashfs filesystems is disabled
+# The squashfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems 
+# (similar to cramfs ). A squashfs image can be used without having to first decompress the image.
+#Disabling squashfs will prevent the use of snap. Snap is a package manager for Linux for installing Snap packages
+- name: 1.1.1.6 Ensure mounting of squashfs filesystems is disabled
+  block:
+    - name: 1.1.1.6 Ensure mounting of squashfs filesystems is disabled
+      lineinfile:
+        dest: /etc/modprobe.d/CIS.conf
+        regexp: "^(#)?install squashfs(\\s|$)"
+        line: "install squashfs /bin/true"
+        state: present
+        create: true
+    - name: 1.1.1.6 Ensure mounting of squashfs filesystems is disabled | modprobe
+      modprobe:
+        name: squashfs
+        state: absent
+  when: disable_squashfs
+  tags:
+    - section1
+    - level_1_server
+    - level_1_workstation
+    - 1.1.1.5
+    - filesystems
+    - squashfs
+    - modprobe
+# 1.1.1.7 Ensure mounting of udf filesystems is disabled
 # The udf filesystem type is the universal disk format used to implement ISO/IEC 13346 and
 # ECMA-167 specifications. This is an open vendor filesystem type for data storage on a
 # broad range of media. This filesystem type is necessary to support writing DVDs and newer
 # optical disc formats.
-- name: 1.1.1.6 Ensure mounting of udf filesystems is disabled
+- name: 1.1.1.7 Ensure mounting of udf filesystems is disabled
   block:
-    - name: 1.1.1.6 Ensure mounting of udf filesystems is disabled
+    - name: 1.1.1.7 Ensure mounting of udf filesystems is disabled
       lineinfile:
         dest: /etc/modprobe.d/CIS.conf
         regexp: "^(#)?install udf(\\s|$)"
         line: "install udf /bin/true"
         state: present
         create: true
-    - name: 1.1.1.6 Ensure mounting of udf filesystems is disabled | modprobe
+    - name: 1.1.1.7 Ensure mounting of udf filesystems is disabled | modprobe
       modprobe:
         name: udf
         state: absent
@@ -163,7 +189,7 @@
   tags:
     - section1
     - level_1_server    - level_1_workstation
-    - 1.1.1.6
+    - 1.1.1.7
     - filesystems
     - udf
     - modprobe
@@ -289,9 +315,9 @@
     - 1.1.10
     - manual
 # 1.1.11 Ensure separate partition exists for /var/tmp
-# 1.1.12 Ensure nodev option set on /var/tmp partition
-# 1.1.13 Ensure nosuid option set on /var/tmp partition
-# 1.1.14 Ensure noexec option set on /var/tmp partition
+# 1.1.12 Ensure /var/tmp partition includes the nodev option
+# 1.1.13 Ensure /var/tmp partition includes the nosuid option
+# 1.1.14 Ensure /var/tmp partition includes the noexec option
 # The /var/tmp directory is a world-writable directory used for temporary storage by all
 # users and some applications.
 - name: "1.1.12 Ensure nodev option set on /var/tmp partition\n
@@ -315,6 +341,7 @@
     - 1.1.14
     - mount
     - tmp
+    - manual
 # 1.1.15 Ensure separate partition exists for /var/log
 - name: 1.1.15 Ensure separate partition exists for /var/log
   debug:
@@ -345,7 +372,7 @@
     - level_2_workstation
     - 1.1.17
     - manual
-# 1.1.18 Ensure nodev option set on /home partition
+#1.1.18 Ensure /home partition includes the nodev option
 - name: 1.1.18 Ensure nodev option set on /home partition
   debug:
     msg: For new installations, during installation create a custom partition setup and specify a separate partition
@@ -552,18 +579,18 @@
 # files are changed. When setting up AIDE, decide internally what the site policy will be
 # concerning integrity checking. Review the AIDE quick start guide and AIDE documentation
 # before proceeding.
-# 1.4.1 Ensure AIDE is installed
+# 1.3.1 Ensure AIDE is installed
 # AIDE takes a snapshot of filesystem state including modification times, permissions, and
 # file hashes which can then be used to compare against the current state of the filesystem to
 # detect modifications to the system.
 # Note: The prelinking feature can interfere with AIDE because it alters binaries to speed up
 # their start up times. Run prelink -ua to restore the binaries to their prelinked state, thus
 # avoiding false positives from AIDE.
-- name: 1.4.1 Ensure AIDE is installed
+- name: 1.3.1 Ensure AIDE is installed
   block:
-    - name: 1.4.1 Ensure AIDE is installed
+    - name: 1.3.1 Ensure AIDE is installed
       apt:
-        name: ["nullmailer", "aide-common", "aide"]
+        name: [ "aide-common", "aide"]
         state: present
         install_recommends: false
     - name: Configure default AIDE excludes file
@@ -594,7 +621,7 @@
     - level_1_server
     - level_1_workstation
     - 1.4.1
-# 1.4.2 Ensure filesystem integrity is regularly checked
+# 1.3.2 Ensure filesystem integrity is regularly checked
 # Periodic checking of the filesystem integrity is needed to detect changes to the filesystem.
 # Notes:
 # The checking in this recommendation occurs every day at 5am. Alter the frequency and
@@ -603,7 +630,7 @@
 # been included as an optional alternative to using cron
 # Ubuntu advises using /usr/bin/aide.wrapper rather than calling /usr/bin/aide
 # directly in order to protect the database and prevent conflicts
-- name: 1.4.2 Ensure filesystem integrity is regularly checked | Cron
+- name: 1.3.2 Ensure filesystem integrity is regularly checked | Cron
   cron:
     name: Run AIDE integrity check weekly
     user: root
@@ -617,11 +644,15 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.4.2
+    - 1.3.2
+
+# 1.4.1 Ensure permissions on bootloader config are not overridden
+# TODO
+
 # 1.5 Secure Boot Settings
 # The recommendations in this section focus on securing the bootloader and settings
 # involved in the boot process directly.
-# 1.5.1 Ensure bootloader password is set
+# 1.4.2 Ensure bootloader password is set
 # Setting the boot loader password will require that anyone rebooting the system must enter
 # a password before being able to set command line boot parameters
 # Note: This recommendation is designed around the grub bootloader, if LILO or another
@@ -635,19 +666,19 @@
     - meta: end_play
   when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
 
-- name: 1.5.1 Ensure bootloader password is set
+- name: 1.4.2 Ensure bootloader password is set
   block:
-    - name: 1.5.1 Ensure bootloader password is set - step 1 - check bootloader_credentials.password has been changed
+    - name: 1.4.2 Ensure bootloader password is set - step 1 - check bootloader_credentials.password has been changed
       fail:
         msg: "Exiting: Change bootloader_credentials.password from b00tl04derPwd in defaults/main.yml"
       when: set_bootloader_credentials and bootloader_credentials.password is match ("b00tl04derPwd")
 
-    - name: 1.5.1 Ensure bootloader password is set - step 2 - check if it isn't already set up
+    - name: 1.4.2 Ensure bootloader password is set - step 2 - check if it isn't already set up
       shell: /bin/grep -e "^[\s]*password" /boot/grub/grub.cfg | /usr/bin/awk '{print} END {if (NR == 0) print "continue" ; else print "stop"}'
       register: result
       ignore_errors: true
 
-    - name: 1.5.1 Ensure bootloader password is set - step 3 - create bootloader password hash
+    - name: 1.4.2 Ensure bootloader password is set - step 3 - create bootloader password hash
       # bash -c must be used in this strange way or mysterious errors are thrown
       shell: /bin/bash -c "echo -e '{{ bootloader_credentials.password }}\n{{ bootloader_credentials.password }}' | grub-mkpasswd-pbkdf2" | /bin/grep 'hash of your password' | /usr/bin/awk '{print $7}'
       register: password
@@ -656,7 +687,7 @@
         - bootloader_credentials.user
         - bootloader_credentials.password
 
-    - name: 1.5.1 Ensure bootloader password is set - step 4 - create custom grub configuration file
+    - name: 1.4.2 Ensure bootloader password is set - step 4 - create custom grub configuration file
       blockinfile:
         dest: /etc/grub.d/99_custom
         create: yes
@@ -673,7 +704,7 @@
         - bootloader_credentials.user
         - bootloader_credentials.password
 
-    - name: 1.5.1 Ensure bootloader password is set - step 4 - update grub
+    - name: 1.4.2 Ensure bootloader password is set - step 4 - update grub
       shell: update-grub
       when:
         - result.stdout == "continue"
@@ -684,15 +715,15 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.5.1
+    - 1.4.2
 
-# 1.5.2 Ensure permissions on bootloader config are configured
+# 1.4.3 Ensure permissions on bootloader config are configured
 # The grub configuration file contains information on boot settings and passwords for
 # unlocking boot options. The grub configuration is usually grub.cfg stored in /boot/grub/ .
 # Note: This recommendation is designed around the grub bootloader, if LILO or another
 # bootloader is in use in your environment enact equivalent settings. Replace
 # /boot/grub/grub.cfg with the appropriate grub configuration file for your environment
-- name: 1.5.2 Ensure permissions on bootloader config are configured
+- name: 1.4.3 Ensure permissions on bootloader config are configured
   file:
     path: "/boot/grub/grub.cfg"
     owner: root
@@ -702,34 +733,36 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.5.2
-# 1.5.3 Ensure authentication required for single user mode
+    - 1.4.3
+# 1.4.4 Ensure authentication required for single user mode
 # Single user mode is used for recovery when the system detects an issue during boot or by
 # manual selection from the bootloader.
-- name: 1.5.3 Ensure authentication required for single user mode
+- name: 1.4.4 Ensure authentication required for single user mode
   block:
-    - name: 1.5.3 Ensure authentication required for single user mode - check root_password has been changed
+    - name: 1.4.4 Ensure authentication required for single user mode - check root_password has been changed
       fail:
         msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
       when: set_root_password and root_password is match ("r00tP4ssw0rd")
 
-    - name: 1.5.3 Ensure authentication required for single user mode - check if a root password already exists
+    - name: 1.4.4 Ensure authentication required for single user mode - check if a root password already exists
       shell: /bin/grep -e "^root:[\*]:" /etc/shadow | /usr/bin/awk 'END {if (NR != 0) print "continue" ; else print "stop"}'
       register: result
       ignore_errors: true
 
-    - name: 1.5.3 Ensure authentication required for single user mode - create a root password
-      # bash must be used or mysterious errors are thrown
-      shell: /bin/bash -c "echo -e '{{ root_password }}\n{{ root_password }}' | passwd root"
-      when: result.stdout == "continue"
+  rescue:
+    - name: 1.4.4 Ensure authentication required for single user mode - create a root password
+      user: 
+        name: root 
+        update_password: always 
+        password: "{{root_password | password_hash('sha512')}}"
   when: set_root_password and root_password
   tags:
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.5.3
-# 1.6 Additional Process Hardening
-# 1.6.1 Ensure XD/NX support is enabled
+    - 1.4.4
+# 1.5 Additional Process Hardening
+# 1.5.1 Ensure XD/NX support is enabled
 # Recent processors in the x86 family support the ability to prevent code execution on a per
 # memory page basis. Generically and on AMD processors, this ability is called No Execute
 # (NX), while on Intel processors it is called Execute Disable (XD). This ability can help
@@ -740,14 +773,14 @@
 # Note: Ensure your system supports the XD or NX bit and has PAE support before implementing
 # this recommendation as this may prevent it from booting if these are not supported by your
 # hardware
-- name: 1.6.1 Ensure XD/NX support is enabled
+- name: 1.5.1 Ensure XD/NX support is enabled
   block:
-    - name: 1.6.1 Ensure XD/NX support is enabled
+    - name: 1.5.1 Ensure XD/NX support is enabled
       shell: |
         dmesg | grep -E "NX|XD" | grep " active"
       register: xdnx
       ignore_errors: yes
-    - name: 1.6.1 Ensure XD/NX support is enabled
+    - name: 1.5.1 Ensure XD/NX support is enabled
       debug:
         msg: |
           On 32 bit systems install a kernel with PAE support, no installation is required on 64 bit
@@ -760,11 +793,11 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.6.1
-# 1.6.2 Ensure address space layout randomization (ASLR) is enabled
+    - 1.5.1
+# 1.5.2 Ensure address space layout randomization (ASLR) is enabled
 # Address space layout randomization (ASLR) is an exploit mitigation technique which
 # randomly arranges the address space of key data areas of a process.
-- name: 1.6.2 Ensure address space layout randomization (ASLR) is enabled
+- name: 1.5.2 Ensure address space layout randomization (ASLR) is enabled
   sysctl:
     name: kernel.randomize_va_space
     value: "2"
@@ -776,14 +809,14 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.6.2
-# 1.6.3 Ensure prelink is disabled
-- name: 1.6.3 Ensure prelink is disabled
+    - 1.5.2
+# 1.5.3 Ensure prelink is not installed
+- name: 1.5.3 Ensure prelink is not installed
   block:
-    - name: 1.6.3 Ensure prelink is disabled
+    - name: 1.5.3 Ensure prelink is not installed
       command: prelink -ua
       ignore_errors: yes
-    - name: 1.6.3 Ensure prelink is disabled
+    - name: 1.5.3 Ensure prelink is not installed
       apt:
         name: prelink
         state: absent
@@ -791,15 +824,15 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.6.3
-# 1.6.4 Ensure core dumps are restricted
+    - 1.5.3
+# 1.5.4 Ensure core dumps are restricted
 # A core dump is the memory of an executable program. It is generally used to determine
 # why a program aborted. It can also be used to glean confidential information from a core
 # file. The system provides the ability to set a soft limit for core dumps, but this can be
 # overridden by the user.
-- name: 1.6.4 Ensure core dumps are restricted
+- name: 1.5.4 Ensure core dumps are restricted
   block:
-    - name: 1.6.4 Ensure core dumps are restricted | sysctl
+    - name: 1.5.4 Ensure core dumps are restricted | sysctl
       sysctl:
         name: fs.suid_dumpable
         value: "0"
@@ -807,7 +840,7 @@
         reload: true
         sysctl_set: true
         ignoreerrors: true
-    - name: 1.6.4 Ensure core dumps are restricted | limits.conf
+    - name: 1.5.4 Ensure core dumps are restricted | limits.conf
       lineinfile:
         dest: /etc/security/limits.conf
         line: "*                hard    core            0"
@@ -815,11 +848,11 @@
         state: present
         create: true
         insertbefore: "# End of file"
-    - name: 1.6.4 Ensure core dumps are restricted | apt
+    - name: 1.5.4 Ensure core dumps are restricted | apt
       apt:
         name: systemd-coredump
         state: present
-    - name: 1.6.4 Ensure core dumps are restricted | coredump.conf
+    - name: 1.5.4 Ensure core dumps are restricted | coredump.conf
       lineinfile:
         dest: /etc/systemd/coredump.conf
         line: "Storage=none"
@@ -827,7 +860,7 @@
         state: present
         create: true
         insertbefore: "# End of file"
-    - name: 1.6.4 Ensure core dumps are restricted | coredump.conf
+    - name: 1.5.4 Ensure core dumps are restricted | coredump.conf
       lineinfile:
         dest: /etc/systemd/coredump.conf
         line: "ProcessSizeMax=0"
@@ -835,14 +868,14 @@
         state: present
         create: true
         insertbefore: "# End of file"
-    - name: 1.6.4 Ensure core dumps are restricted | reload
+    - name: 1.5.4 Ensure core dumps are restricted | reload
       shell: systemctl daemon-reload
   tags:
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.6.4
-# 1.7 Mandatory Access Control
+    - 1.5.4
+# 1.6 Mandatory Access Control
 # Mandatory Access Control (MAC) provides an additional layer of access restrictions to
 # processes on top of the base Discretionary Access Controls. By restricting how processes
 # can access files and resources on a system the potential impact from vulnerabilities in the
@@ -850,10 +883,10 @@
 # Impact: Mandatory Access Control limits the capabilities of applications and daemons on a
 # system, while this can prevent unauthorized access the configuration of MAC can be complex
 # and difficult to implement correctly preventing legitimate access from occurring.
-# 1.7.1 Configure AppArmor
-# 1.7.1.1 Ensure AppArmor is installed
+# 1.6.1 Configure AppArmor
+# 1.6.1.1 Ensure AppArmor is installed
 # AppArmor provides Mandatory Access Controls.
-- name: 1.7.1.1 Ensure AppArmor is installed
+- name: 1.6.1.1 Ensure AppArmor is installed
   apt:
     name: ["apparmor"]
     state: present
@@ -862,21 +895,21 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.7.1.1
-# 1.7.1.2 Ensure AppArmor is enabled in the bootloader configuration
+    - 1.6.1.1
+# 1.6.1.2 Ensure AppArmor is enabled in the bootloader configuration
 # Configure AppArmor to be enabled at boot time and verify that it has not been overwritten
 # by the bootloader boot parameters.
 # Note: This recommendation is designed around the grub bootloader, if LILO or another
 # bootloader is in use in your environment enact equivalent settings.
-- name: 1.7.1.2 Ensure AppArmor is enabled in the bootloader configuration
+- name: 1.6.1.2 Ensure AppArmor is enabled in the bootloader configuration
   block:
-    - name: 1.7.1.2 Ensure AppArmor is enabled in the bootloader configuration
+    - name: 1.6.1.2 Ensure AppArmor is enabled in the bootloader configuration
       replace:
         path: /etc/default/grub
         regexp: '^(GRUB_CMDLINE_LINUX=(?!.*apparmor)\"[^\"]*)(\".*)'
         replace: '\1 apparmor=1 security=apparmor\2'
       register: output_1_7_1_2
-    - name: 1.7.1.2 Ensure AppArmor is enabled in the bootloader configuration | reload
+    - name: 1.6.1.2 Ensure AppArmor is enabled in the bootloader configuration | reload
       shell: |
         update-grub
       when: output_1_7_1_2  | bool
@@ -884,11 +917,11 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.7.1.2
-# 1.7.1.3 Ensure all AppArmor Profiles are in enforce or complain mode
+    - 1.6.1.2
+# 1.6.1.3 Ensure all AppArmor Profiles are in enforce or complain mode
 # AppArmor profiles define what resources applications are able to access.
-- name: "1.7.1.3 Ensure all AppArmor Profiles are in enforce or complain mode\n
-         1.7.1.4 Ensure all AppArmor Profiles are enforcing"
+- name: "1.6.1.3 Ensure all AppArmor Profiles are in enforce or complain mode\n
+         1.6.1.4 Ensure all AppArmor Profiles are enforcing"
   shell: |
     find /etc/apparmor.d -maxdepth 1 -type f | while read file
     do
@@ -900,17 +933,17 @@
     - section1
     - level_2_server
     - level_2_workstation
-    - 1.7.1.3
-    - 1.7.1.4
-# 1.8 Warning Banners
+    - 1.6.1.3
+    - 1.6.1.4
+# 1.7 Warning Banners
 # Presenting a warning message prior to the normal user login may assist in the prosecution
 # of trespassers on the computer system. Changing some of these login banners also has the
 # side effect of hiding OS version information and other detailed system information from
 # attackers attempting to target specific exploits at a system.
-# 1.8.1 Command Line Warning Banners
+# 1.7.1 Command Line Warning Banners
 # The /etc/motd , /etc/issue , and /etc/issue.net files govern warning banners for
 # standard command line logins for both local and remote users.
-# 1.8.1.1 Ensure message of the day is configured properly
+# 1.7.1 Ensure message of the day is configured properly
 # The contents of the /etc/motd file are displayed to users after login and function as a
 # message of the day for authenticated users.
 # Unix-based systems have typically displayed information about the OS release and patch
@@ -921,8 +954,8 @@
 
 # We allow overwriting the default motd message (contained in files/templates/motd.j2) by a custom template, whose path
 # has to be defined in the variable "custom_motd_file_path".
-- name: "1.8.1.1 Ensure message of the day is configured properly\n
-         1.8.1.4 Ensure permissions on /etc/motd are configured"
+- name: "1.7.1 Ensure message of the day is configured properly\n
+         1.7.4 Ensure permissions on /etc/motd are configured "
   template:
     src: "{{ lookup('first_found', motd, errors='ignore') }}"
     dest: /etc/motd
@@ -937,11 +970,11 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.8.1.1
-    - 1.8.1.4
-# 1.8.1.2 Ensure local login warning banner is configured properly
-- name: "1.8.1.2 Ensure local login warning banner is configured properly\n
-         1.8.1.5 Ensure permissions on /etc/issue are configured"
+    - 1.7.1
+    - 1.7.4
+# 1.7.2 Ensure local login warning banner is configured properly
+- name: "1.7.2 Ensure local login warning banner is configured properly\n
+         1.7.5 Ensure permissions on /etc/issue are configured"
   template:
     src: files/templates/issue.j2
     dest: /etc/issue
@@ -952,11 +985,9 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.8.1.2
-    - 1.8.1.5
-# 1.8.1.3 Ensure remote login warning banner is configured properly
-- name: "1.8.1.3 Ensure remote login warning banner is configured properly\n
-         1.8.1.6 Ensure permissions on /etc/issue.net are configured"
+    - 1.7.2
+# 1.7.3 Ensure remote login warning banner is configured properly
+- name: "1.7.3 Ensure remote login warning banner is configured properly"
   template:
     src: files/templates/issue.net.j2
     dest: /etc/issue.net
@@ -967,8 +998,41 @@
     - section1
     - level_1_server
     - level_1_workstation
-    - 1.8.1.3
-    - 1.8.1.6
+    - 1.7.3
+#The contents of the /etc/issue.net file are displayed to users prior to login for remote connections from configured services.
+- name: 1.7.6 Ensure permissions on /etc/issue.net are configured
+  ansible.builtin.file:
+    path: /etc/issue.net
+    owner: root
+    group: root
+    mode: "u-x,go-wx"
+  tags:
+    - section1
+    - level_1_server
+    - level_1_workstation
+    - 1.7.6
+
+# 1.8 GNOME Display Manager
+# Note: If GDM is not installed on the system, this section can be skipped
+# 1.8.1 Ensure GNOME Display Manager is removed
+# apt purge gdm3
+# 1.8.2 Ensure GDM login banner is configured
+# Edit or create the file /etc/gdm3/greeter.dconf-defaults and add the following:
+# [org/gnome/login-screen] 
+# banner-message-enable=true 
+# banner-message-text='<banner message>' 
+# disable-user-list=true
+# Then dpkg-reconfigure gdm3
+# 1.8.3 Ensure disable-user-list is enabled
+# Edit or create the file /etc/gdm3/greeter.dconf-defaults and edit or add the following:
+# [org/gnome/login-screen] 
+# banner-message-enable=true 
+# banner-message-text='<banner message>' 
+# disable-user-list=true
+# Then dpkg-reconfigure gdm3
+# 1.8.4 Ensure XDCMP is not enabled
+# Edit the file /etc/gdm3/custom.conf and remove the line: 
+# Enable=true
 # 1.9 Ensure updates, patches, and additional security software are installed
 - name: 1.9 Ensure updates, patches, and additional security software are installed
   apt:
@@ -979,14 +1043,3 @@
     - level_1_server
     - level_1_workstation
     - "1.9"
-# 1.10 Ensure GDM is removed or login is configured
-- name: 1.10 Ensure GDM is removed or login is configured
-  template:
-    src: files/templates/greeter.dconf-defaults.j2
-    dest: /etc/gdm3/greeter.dconf-defaults
-  ignore_errors: yes
-  tags:
-    - section1
-    - level_1_server
-    - level_1_workstation
-    - "1.10"
