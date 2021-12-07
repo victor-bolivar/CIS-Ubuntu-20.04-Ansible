@@ -89,7 +89,7 @@ Examples of config that should be immediately considered for exclusion:
 
 #Section 5
 #5.1.8 Ensure cron is restricted to authorized users
-allowd_hosts: "ALL: 0.0.0.0/0.0.0.0, 192.168.2.0/255.255.255.0"
+allowed_hosts: "ALL: 0.0.0.0/0.0.0.0, 192.168.2.0/255.255.255.0"
 # 5.2.17 Ensure SSH access is limited
 allowed_users: ali saleh baker root #Put None or list of users space between each user
 
@@ -138,7 +138,7 @@ ansible-playbook -i host run.yaml -t section2 -t 6.1.1
 * Note:
 When run an individual task be sure from the dependencies between tasks, for example, if you run tag **4.1.1.2 Ensure auditd service is enabled** before running **4.1.1.1 Ensure auditd is installed** you will get an error at the run time.
 
-* Points with ~~Tilda~~ not implemented yet, currently I'm working on it.
+* Points with ~~Tilde~~ not implemented yet, currently I'm working on it.
 * make sure to select one time service, for me I use ntp, but you can use other service such as [`systemd-timesyncd`,`ntp`,`chrony`] under the settings `defaults/main.yaml`
 > Testing
 > 11/1/2020 Tested on AWS EC2 ubuntu 20.04 LTS [Pass]
@@ -470,7 +470,7 @@ _________________
   connection: local
 ```
 * if you faced issue with execut, try to run the playbook in another path, like `/srv/`.
-* For error like this `stderr: chage: user 'ubuntu' does not exist in /etc/passed`, make sure to update config under `CIS-Ubuntu-20.04-Ansible/defaults/main.yml`
+* For error like this `stderr: chage: user 'ubuntu' does not exist in /etc/passwd`, make sure to update config under `CIS-Ubuntu-20.04-Ansible/defaults/main.yml`
 
 
 ```Bash
