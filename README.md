@@ -89,7 +89,7 @@ Examples of config that should be immediately considered for exclusion:
 
 #Section 5
 #5.1.8 Ensure cron is restricted to authorized users
-allowd_hosts: "ALL: 0.0.0.0/0.0.0.0, 192.168.2.0/255.255.255.0"
+allowed_hosts: "ALL: 0.0.0.0/0.0.0.0, 192.168.2.0/255.255.255.0"
 # 5.2.17 Ensure SSH access is limited
 allowed_users: ali saleh baker root #Put None or list of users space between each user
 
