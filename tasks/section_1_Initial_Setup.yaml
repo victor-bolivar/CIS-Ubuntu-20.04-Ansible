@@ -448,6 +448,7 @@
       apt:
         name: autofs
         state: absent
+        purge: yes
   when: disable_autofs
   tags:
     - section1
