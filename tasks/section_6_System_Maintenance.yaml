@@ -367,6 +367,11 @@
     - name: 6.2.7 Ensure users dot files are not group or world writable | list
       script: 6_2_7.sh
       register: output_6_2_7
+      when: not include_folders
+    - name: 6.2.7 Ensure users dot files and folders are not group or world writable | list
+      script: 6_2_7_include_folders.sh
+      register: output_6_2_7
+      when: include_folders
     - name: 6.2.7 Ensure users' dot files are not group or world writable | save output
       copy:
         dest: "{{ outputfiles }}/6.2.7"
