@@ -72,7 +72,7 @@
   file:
     dest: /etc/shadow
     owner: root
-    group: shadow
+    group: root
     mode: 0640
   tags:
     - section6
