@@ -158,5 +158,8 @@ outputfiles: /root/ #Output dir of some command
 disable_autofs: true
 disable_usb: true
 install_apparmor: true
+## 6.1.6 Ensure permissions on /etc/shadow are configured
+etc_shadow_group: shadow
+
 ## 6.2.7 Ensure users' dot files are not group or world accessible
 fix_dot_file_permissions: yes

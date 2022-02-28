@@ -68,11 +68,11 @@
     - 6.1.5
 
 # 6.1.6 Ensure permissions on /etc/shadow are configured
-- name: 6.1.6 Ensure permissions on /etc/shadow are configured
+- name: 6.1.6 Ensure permissions on /etc/shadow are configured, with group '{{ etc_shadow_group }}'
   file:
     dest: /etc/shadow
     owner: root
-    group: root
+    group: "{{ etc_shadow_group }}"
     mode: 0640
   tags:
     - section6
