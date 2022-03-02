@@ -132,6 +132,8 @@ max_auth_tries: 4
 ssh_max_startups: "10:30:100"
 ## 5.2.22 Ensure SSH MaxSessions is limited
 ssh_max_sessions: 10
+## 5.3.10 Allow root logins for a certain list of IPs (default: no root login allowed), e.g. "192.168.10.10,192.168.1.0/24"
+ssh_root_login_ips: None
 ## 5.4.1.1 Ensure password expiration is 365 days or less
 pass_expire_in_days: 300
 pass_warn_age: 7
@@ -158,6 +160,8 @@ outputfiles: /root/ #Output dir of some command
 disable_autofs: true
 disable_usb: true
 install_apparmor: true
+## 6.1.6 Ensure permissions on /etc/shadow are configured
+etc_shadow_group: shadow
 # 6.1.11 Ensure no unowned files or directories exist
 strings_to_skip: None #Allows for skipping certain strings in the search. Takes comma separated values such as "/var/lib/docker,/var/lib/kubelet"
 ## 6.2.7 Ensure users' dot files are not group or world accessible

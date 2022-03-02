@@ -320,16 +320,29 @@
 # 5.3.10 Ensure SSH root login is disabled
 # Disallowing root logins over SSH requires system admins to authenticate using their own individual account, then escalating to root via sudo or su . This in turn limits opportunity for non-repudiation and provides a clear audit trail in the event of a security incident
 - name: 5.3.10 Ensure SSH root login is disabled
-  lineinfile:
-    state: present
-    dest: /etc/ssh/sshd_config
-    regexp: "^PermitRootLogin"
-    line: "PermitRootLogin no"
+  block:
+    - name: "5.3.10 Ensure SSH root login is disabled: default"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin .*"
+        line: "PermitRootLogin no"
+    - name: "5.3.10 Ensure SSH root login is disabled: remove root login for all existing IPs"
+      replace:
+        dest: /etc/ssh/sshd_config
+        regexp: "^Match Address.*\n.*PermitRootLogin.*$"
+    - name: "5.3.10 Ensure SSH root login is disabled: allow ssh root login from '{{ ssh_root_login_ips }}'"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^Match Address.*\n*PermitRootLogin.*"
+        line: "Match Address {{ ssh_root_login_ips }}\n PermitRootLogin yes"
+      when: (ssh_root_login_ips != "None") and (ssh_root_login_ips|length > 0)
   tags:
-    - section5
-    - level_1_server
-    - level_1_workstation
-    - 5.3.10
+  - section5
+  - level_1_server
+  - level_1_workstation
+  - 5.3.10
 # 5.3.11 Ensure SSH PermitEmptyPasswords is disabled
 # Disallowing remote shell access to accounts that have an empty password reduces the probability of unauthorized access to the system
 - name: 5.3.11 Ensure SSH PermitEmptyPasswords is disabled
