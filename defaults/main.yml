@@ -165,3 +165,4 @@ etc_shadow_group: shadow
 
 ## 6.2.7 Ensure users' dot files are not group or world accessible
 fix_dot_file_permissions: yes
+include_folders: false # Include folders as well as files
