@@ -143,9 +143,18 @@
 # 6.1.11 Ensure no unowned files or directories exist
 - name: 6.1.11 Ensure no unowned files or directories exist
   block:
-    - name: 6.1.11 Ensure no unowned files or directories exist | Find
-      shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null && true || true
-      register: output_6_1_11
+    - name: 6.1.11 Ensure no unowned files or directories exist | No skipped strings
+      block:
+        - name: 6.1.11 Ensure no unowned files or directories exist | Find
+          shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null && true || true
+          register: output_6_1_11
+      when: strings_to_skip == None
+    - name: 6.1.11 Ensure no unowned files or directories exist | Skipping specified strings
+      block:
+        - name: 6.1.11 Ensure no unowned files or directories exist | Find
+          shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null | grep -v -e  $(echo "{{ strings_to_skip }}" |  sed 's/,/\\|/g') && true || true
+          register: output_6_1_11
+      when: strings_to_skip != None
     - name: 6.1.11 Ensure no unowned files or directories exist | Save output
       copy:
         dest: "{{ outputfiles }}/6.1.11"
