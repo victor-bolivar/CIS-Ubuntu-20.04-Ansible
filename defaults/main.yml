@@ -167,3 +167,5 @@ strings_to_skip: None #Allows for skipping certain strings in the search. Takes 
 ## 6.2.7 Ensure users' dot files are not group or world accessible
 fix_dot_file_permissions: yes
 include_folders: false # Include folders as well as files
+## 6.2.12 Ensure root PATH Integrity
+delete_nonexisting_paths: false # Deletes paths that are neither files nor folders from /etc/environment

@@ -478,6 +478,18 @@
 # 6.2.12 Ensure root PATH Integrity
 - name: 6.2.12 Ensure root PATH Integrity
   block:
+    - name: 6.2.12 Ensure root PATH Integrity | run | Delete nonexisting paths
+      block:
+      - name: 6.2.12 Ensure root PATH Integrity | run | Delete nonexisting paths
+        script: 6_2_3_delete_nonexisting.sh
+        register: output_6_2_3
+      when: delete_nonexisting_paths
+    - name: 6.2.12 Ensure root PATH Integrity | run
+      block:
+      - name: 6.2.12 Ensure root PATH Integrity | run
+        script: 6_2_3.sh
+        register: output_6_2_3
+      when: not delete_nonexisting_paths
     - name: 6.2.12 Ensure root PATH Integrity | run
       script: 6_2_3.sh
       register: output_6_2_3
