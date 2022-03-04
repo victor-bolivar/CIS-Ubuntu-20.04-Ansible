@@ -163,9 +163,9 @@ install_apparmor: true
 ## 6.1.6 Ensure permissions on /etc/shadow are configured
 etc_shadow_group: shadow
 # 6.1.11 Ensure no unowned files or directories exist
-strings_to_skip: None #Allows for skipping certain strings in the search. Takes comma separated values such as "/var/lib/docker,/var/lib/kubelet"
+unowned_files_strings_to_skip: None #Allows for skipping certain strings in the search. Takes comma separated values such as "/var/lib/docker,/var/lib/kubelet"
 ## 6.2.7 Ensure users' dot files are not group or world accessible
 fix_dot_file_permissions: yes
-include_folders: false # Include folders as well as files
+fix_dot_include_folders: false # Include folders as well as files
 ## 6.2.12 Ensure root PATH Integrity
-delete_nonexisting_paths: false # Deletes paths that are neither files nor folders from /etc/environment
+path_integrity_delete_nonexisting_paths: false # Deletes paths that are neither files nor folders from /etc/environment
