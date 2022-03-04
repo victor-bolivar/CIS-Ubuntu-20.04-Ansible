@@ -148,13 +148,13 @@
         - name: 6.1.11 Ensure no unowned files or directories exist | Find
           shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null && true || true
           register: output_6_1_11
-      when: strings_to_skip == None
+      when: unowned_files_strings_to_skip == None
     - name: 6.1.11 Ensure no unowned files or directories exist | Skipping specified strings
       block:
         - name: 6.1.11 Ensure no unowned files or directories exist | Find
-          shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null | grep -v -e  $(echo "{{ strings_to_skip }}" |  sed 's/,/\\|/g') && true || true
+          shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null | grep -v -e  $(echo "{{ unowned_files_strings_to_skip }}" |  sed 's/,/\\|/g') && true || true
           register: output_6_1_11
-      when: strings_to_skip != None
+      when: unowned_files_strings_to_skip != None
     - name: 6.1.11 Ensure no unowned files or directories exist | Save output
       copy:
         dest: "{{ outputfiles }}/6.1.11"
@@ -376,11 +376,11 @@
     - name: 6.2.7 Ensure users dot files are not group or world writable | list
       script: 6_2_7.sh
       register: output_6_2_7
-      when: not include_folders
+      when: not fix_dot_include_folders
     - name: 6.2.7 Ensure users dot files and folders are not group or world writable | list
       script: 6_2_7_include_folders.sh
       register: output_6_2_7
-      when: include_folders
+      when: fix_dot_include_folders
     - name: 6.2.7 Ensure users' dot files are not group or world writable | save output
       copy:
         dest: "{{ outputfiles }}/6.2.7"
@@ -478,18 +478,18 @@
 # 6.2.12 Ensure root PATH Integrity
 - name: 6.2.12 Ensure root PATH Integrity
   block:
-    - name: 6.2.12 Ensure root PATH Integrity | run | Delete nonexisting paths
+    - name: 6.2.12 Ensure root PATH Integrity | run | Delete non-existing folders from PATH
       block:
-      - name: 6.2.12 Ensure root PATH Integrity | run | Delete nonexisting paths
+      - name: 6.2.12 Ensure root PATH Integrity | run | Delete non-existing folders from PATH
         script: 6_2_3_delete_nonexisting.sh
         register: output_6_2_3
-      when: delete_nonexisting_paths
+      when: path_integrity_delete_nonexisting_paths
     - name: 6.2.12 Ensure root PATH Integrity | run
       block:
       - name: 6.2.12 Ensure root PATH Integrity | run
         script: 6_2_3.sh
         register: output_6_2_3
-      when: not delete_nonexisting_paths
+      when: not path_integrity_delete_nonexisting_paths
     - name: 6.2.12 Ensure root PATH Integrity | run
       script: 6_2_3.sh
       register: output_6_2_3
