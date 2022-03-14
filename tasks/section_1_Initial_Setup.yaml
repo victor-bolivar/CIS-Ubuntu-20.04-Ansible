@@ -956,14 +956,20 @@
 
 # We allow overwriting the default motd message (contained in files/templates/motd.j2) by a custom template, whose path
 # has to be defined in the variable "custom_motd_file_path".
-- name: "1.7.1 Ensure message of the day is configured properly\n
-         1.7.4 Ensure permissions on /etc/motd are configured "
-  template:
-    src: "{{ lookup('first_found', motd, errors='ignore') }}"
-    dest: /etc/motd
-    owner: root
-    group: root
-    mode: "u-x,go-wx"
+- block:
+  - name: "1.7.1 Ensure message of the day is configured properly\n
+          1.7.4 Ensure permissions on /etc/motd are configured "
+    template:
+      src: "{{ lookup('first_found', motd, errors='ignore') }}"
+      dest: /etc/motd
+      owner: root
+      group: root
+      mode: "u-x,go-wx"
+  - name: "1.7.1 Ensure message of the day is configured properly\n
+          1.7.4 Ensure permissions on /etc/motd are configured  | Show templates used"
+    debug:
+      msg: "{{'custom file not found, using default' if 'files/templates/motd.j2' in lookup('first_found', motd, errors='warn') else 'Custom file found, using ' ~ custom_motd_file_path }}"
+    run_once: true
   vars:
     - motd:
       - "{{ custom_motd_file_path }}"
