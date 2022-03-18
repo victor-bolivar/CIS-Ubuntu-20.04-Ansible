@@ -327,21 +327,21 @@
   block:
     - name: 6.2.5 Ensure users own their home directories | list
       script: 6_2_5.sh
-      register: output_6_2_6
+      register: output_6_2_5
     - name: 6.2.5 Ensure users own their home directories | Var
       set_fact:
-        output_6_2_6_list: "{{ output_6_2_6.stdout_lines | list }}"
+        output_6_2_5_list: "{{ output_6_2_5.stdout_lines | list }}"
     - name: 6.2.5 Ensure users own their home directories | save output
       copy:
         dest: "{{ outputfiles }}/6.2.5"
-        content: "{{ output_6_2_6_list }}"
+        content: "{{ output_6_2_5_list }}"
     - name: 6.2.5 Ensure users own their home directories | fix
       file:
         path: "{{ item.split(',')[0] }}"
         group: "{{ item.split(',')[1] }}"
         owner: "{{ item.split(',')[1] }}"
         recurse: yes
-      with_items: "{{ output_6_2_6_list }}"
+      with_items: "{{ output_6_2_5_list }}"
   tags:
     - section6
     - level_1_server
@@ -353,17 +353,17 @@
   block:
     - name: 6.2.6 Ensure users home directories permissions are 750 or more restrictive - list
       script: 6_2_6.sh
-      register: output_6_2_5
+      register: output_6_2_6
     - name: 6.2.6 Ensure users' home directories permissions are 750 or more restrictive - print output
       copy:
         dest: "{{ outputfiles }}/6.2.6"
-        content: "{{ output_6_2_5.stdout_lines }}"
+        content: "{{ output_6_2_6.stdout_lines }}"
     - name: 6.2.6 Ensure users home directories permissions are 750 or more restrictive - fix
       file:
         name: "{{ item }}"
         mode: "g-w,o-rwx"
-      with_items: "{{ output_6_2_5.stdout_lines }}"
-      when: "{{ output_6_2_5.stdout_lines|length > 0 }}"
+      with_items: "{{ output_6_2_6.stdout_lines }}"
+      when: "{{ output_6_2_6.stdout_lines|length > 0 }}"
   tags:
     - section6
     - level_1_server
