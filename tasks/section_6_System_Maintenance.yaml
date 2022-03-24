@@ -405,12 +405,12 @@
 - name: 6.2.8 Ensure no users have .netrc files
   block:
     - name: 6.2.8 Ensure no users have .netrc files | list
-      script: 6_2_9.sh
-      register: output_6_2_9
+      script: 6_2_8.sh
+      register: output_6_2_8
     - name: 6.2.8 Ensure no users have .netrc files | save output
       copy:
         dest: "{{ outputfiles }}/6.2.8"
-        content: "{{ output_6_2_9.stdout }}"
+        content: "{{ output_6_2_8.stdout }}"
   tags:
     - section6
     - level_1_server
@@ -422,12 +422,12 @@
 - name: 6.2.9 Ensure no users have .forward files
   block:
     - name: 6.2.9 Ensure no users have .forward files | list
-      script: 6_2_8.sh
-      register: output_6_2_8
+      script: 6_2_9.sh
+      register: output_6_2_9
     - name: 6.2.9 Ensure no users have .forward files  | save output
       copy:
         dest: "{{ outputfiles }}/6.2.9"
-        content: "{{ output_6_2_8.stdout }}"
+        content: "{{ output_6_2_9.stdout }}"
   tags:
     - section6
     - level_1_server
