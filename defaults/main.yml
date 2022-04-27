@@ -146,6 +146,8 @@ list_of_os_users:
 account_inactive: 30
 ## 5.4.5 Ensure default user shell timeout is 900 seconds or less
 shell_timeout_sec: 900
+## 5.5.4 Ensure default user umask is 027 or more restrictive
+fix_command_not_found: false # Adds a change to /etc/apt/apt.conf.d/50command-not-found to fix a known issue.
 
 # Section 5 PAM config
 usersAllowedToSuAccess:
