@@ -648,12 +648,25 @@
     - level_1_workstation
     - 1.3.2
 
-# 1.4.1 Ensure permissions on bootloader config are not overridden
-# TODO
 
 # 1.5 Secure Boot Settings
 # The recommendations in this section focus on securing the bootloader and settings
 # involved in the boot process directly.
+
+# 1.4.1 Ensure permissions on bootloader config are not overridden
+- name: 1.4.1 Ensure permissions on bootloader config are not overridden 
+  block:
+    - name: 1.4.1 Ensure permissions on bootloader config are not overridden - step 1 - update chmod 444 to chmod 400 in /usr/sbin/grubmkconfig
+      shell: sed -ri 's/chmod\s+[0-7][0-7][0-7]\s+\$\{grub_cfg\}\.new/chmod 400 ${grub_cfg}.new/' /usr/sbin/grub-mkconfig
+    - name: 1.4.1 Ensure permissions on bootloader config are not overridden - step 2 -  check on password not being set to before running chmod command
+      shell:  sed -ri 's/ && ! grep "\^password" \$\{grub_cfg\}.new >\/dev\/null//' /usr/sbin/grub-mkconfig
+  when: protect_bootloader_permissions
+  tags:
+    - section1
+    - level_1_server
+    - level_1_workstation
+    - 1.4.1
+
 # 1.4.2 Ensure bootloader password is set
 # Setting the boot loader password will require that anyone rebooting the system must enter
 # a password before being able to set command line boot parameters
