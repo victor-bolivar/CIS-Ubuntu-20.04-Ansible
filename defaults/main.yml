@@ -162,6 +162,8 @@ disable_usb: true
 install_apparmor: true
 ## 6.1.6 Ensure permissions on /etc/shadow are configured
 etc_shadow_group: shadow
+## 6.1.7 Ensure permissions on /etc/shadow- are configured
+etc_shadow_mode: 0600 # Must be 0600 or 0640
 # 6.1.11 Ensure no unowned files or directories exist
 unowned_files_strings_to_skip: None #Allows for skipping certain strings in the search. Takes comma separated values such as "/var/lib/docker,/var/lib/kubelet"
 ## 6.2.7 Ensure users' dot files are not group or world accessible

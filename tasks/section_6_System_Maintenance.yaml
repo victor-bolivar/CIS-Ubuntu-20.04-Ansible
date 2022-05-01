@@ -86,7 +86,7 @@
     dest: /etc/shadow-
     owner: root
     group: shadow
-    mode: 0600
+    mode: "{{ etc_shadow_mode }}"
   tags:
     - section6
     - level_1_server
