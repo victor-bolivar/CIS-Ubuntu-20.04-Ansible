@@ -487,7 +487,7 @@
     - section4
     - level_1_server
     - level_1_workstation
-    - _4.3
+    - "4.3"
 # 4.4 Ensure logrotate assigns appropriate permissions
 # It is important to ensure that log files have the correct permissions to ensure that sensitive data is archived and protected.
 - name: 4.4 Ensure logrotate assigns appropriate permissions
@@ -502,4 +502,4 @@
     - section4
     - level_1_server
     - level_1_workstation
-    - _4.4
+    - "4.4"
