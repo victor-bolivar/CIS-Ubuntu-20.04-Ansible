@@ -493,8 +493,9 @@
 - name: 4.4 Ensure logrotate assigns appropriate permissions
   lineinfile:
     dest: /etc/logrotate.conf
-    regexp: "^create"
-    line: "create 0640 root utmp"
+    regexp: "^create\\s*(\\S*)\\s*(\\S*)\\s*(\\S*)"
+    line: create 0640 \g<2> \g<3>
+    backrefs: true
   notify:
     - journald restart
   tags:
