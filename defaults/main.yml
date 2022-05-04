@@ -11,11 +11,13 @@ disable_udf: yes
 disable_fat: yes
 temp_dir_size: 1G
 disable_squashfs: no #Disabling squashfs will prevent the use of snap
-## 1.5.1 Ensure bootloader password is set (using grub): default is no
+# 1.4.1 Ensure permissions on bootloader config are not overridden
+protect_bootloader_permissions: true
+## 1.4.2 Ensure bootloader password is set (using grub): default is no
 set_bootloader_credentials: no
 ### Update the default bootloader user and password
 bootloader_credentials: { user: "root", password: "b00tl04derPwd" }
-# 1.5.3 Ensure authentication required for single user mode
+# 1.4.3 Ensure authentication required for single user mode
 set_root_password: yes
 root_password: r00tP4ssw0rd
 ## 1.8.1.4 Ensure permissions on /etc/motd are configured: allow for custom motd template (if the file doesn't exist, the
