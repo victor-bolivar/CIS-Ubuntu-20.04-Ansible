@@ -796,7 +796,7 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - _5.6
+    - "5.6"
     - manual
 # 5.7 Ensure access to the su command is restricted
 # Restricting the use of su , and using sudo in its place, provides system administrators better control of the escalation of user privileges to execute privileged commands. The sudo utility also provides a better logging and audit mechanism, as it can log each command executed via sudo , whereas su can only record that a user executed the su program.
