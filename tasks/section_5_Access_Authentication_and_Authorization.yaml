@@ -744,6 +744,15 @@
         create: true
         regexp: "^umask "
         line: "umask 027"
+    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - Fix for /etc/apt/apt.conf.d/50command-not-found
+      lineinfile:
+        state: present
+        dest: /etc/apt/apt.conf.d/50command-not-found
+        create: false
+        regexp: '"if /usr/bin/test -w /var/lib/command-not-found/ -a -e .*'
+        line:   '    "if /usr/bin/test -w /var/lib/command-not-found/ -a -e /usr/lib/cnf-update-db; then umask 022 && /usr/lib/cnf-update-db > /dev/null; fi";'
+        backrefs: true
+      when: fix_command_not_found
   tags:
     - section5
     - level_1_server
@@ -796,7 +805,7 @@
     - section5
     - level_1_server
     - level_1_workstation
-    - _5.6
+    - "5.6"
     - manual
 # 5.7 Ensure access to the su command is restricted
 # Restricting the use of su , and using sudo in its place, provides system administrators better control of the escalation of user privileges to execute privileged commands. The sudo utility also provides a better logging and audit mechanism, as it can log each command executed via sudo , whereas su can only record that a user executed the su program.
