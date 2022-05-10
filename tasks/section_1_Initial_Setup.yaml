@@ -757,19 +757,18 @@
     - name: 1.4.4 Ensure authentication required for single user mode - check root_password has been changed
       fail:
         msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
-      when: set_root_password and root_password is match ("r00tP4ssw0rd")
+      when: root_password is match ("r00tP4ssw0rd")
 
-    - name: 1.4.4 Ensure authentication required for single user mode - check if a root password already exists
-      shell: /bin/grep -e "^root:[\*]:" /etc/shadow | /usr/bin/awk 'END {if (NR != 0) print "continue" ; else print "stop"}'
-      register: result
-      ignore_errors: true
-
-  rescue:
     - name: 1.4.4 Ensure authentication required for single user mode - create a root password
       user: 
         name: root 
         update_password: always 
         password: "{{root_password | password_hash('sha512')}}"
+
+  rescue:
+    - name: Continue after failing 1.4.4
+      debug:
+        msg: "Continuing with playbook execution"
   when: set_root_password and root_password
   tags:
     - section1
