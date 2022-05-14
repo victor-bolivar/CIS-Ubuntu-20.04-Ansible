@@ -954,9 +954,11 @@
 # of trespassers on the computer system. Changing some of these login banners also has the
 # side effect of hiding OS version information and other detailed system information from
 # attackers attempting to target specific exploits at a system.
+
 # 1.7.1 Command Line Warning Banners
 # The /etc/motd , /etc/issue , and /etc/issue.net files govern warning banners for
 # standard command line logins for both local and remote users.
+
 # 1.7.1 Ensure message of the day is configured properly
 # The contents of the /etc/motd file are displayed to users after login and function as a
 # message of the day for authenticated users.
@@ -992,33 +994,48 @@
     - level_1_workstation
     - 1.7.1
     - 1.7.4
+    -
 # 1.7.2 Ensure local login warning banner is configured properly
+# We allow overwriting the default local login message (contained in files/templates/issue.j2) by a custom template, whose path
+# has to be defined in the variable "custom_issue_file_path".
 - name: "1.7.2 Ensure local login warning banner is configured properly\n
          1.7.5 Ensure permissions on /etc/issue are configured"
   template:
-    src: files/templates/issue.j2
+    src: "{{ lookup('first_found', issue, errors='ignore') }}"
     dest: /etc/issue
     owner: root
     group: root
     mode: "u-x,go-wx"
+  vars:
+    - issue:
+      - "{{ custom_issue_file_path }}"
+      - "files/templates/isssue.j2"
   tags:
     - section1
     - level_1_server
     - level_1_workstation
     - 1.7.2
+    -
 # 1.7.3 Ensure remote login warning banner is configured properly
+# We allow overwriting the default remote login message (contained in files/templates/issue.net.j2) by a custom template, whose path
+# has to be defined in the variable "custom_issue_net_file_path".
 - name: "1.7.3 Ensure remote login warning banner is configured properly"
   template:
-    src: files/templates/issue.net.j2
+    src: "{{ lookup('first_found', issue_net, errors='ignore') }}"
     dest: /etc/issue.net
     owner: root
     group: root
     mode: "u-x,go-wx"
+  vars:
+    - issue:
+      - "{{ custom_issue_net_file_path }}"
+      - "files/templates/isssue.net.j2"
   tags:
     - section1
     - level_1_server
     - level_1_workstation
     - 1.7.3
+
 #The contents of the /etc/issue.net file are displayed to users prior to login for remote connections from configured services.
 - name: 1.7.6 Ensure permissions on /etc/issue.net are configured
   ansible.builtin.file:
