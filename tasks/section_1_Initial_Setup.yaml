@@ -949,6 +949,7 @@
     - level_2_workstation
     - 1.6.1.3
     - 1.6.1.4
+
 # 1.7 Warning Banners
 # Presenting a warning message prior to the normal user login may assist in the prosecution
 # of trespassers on the computer system. Changing some of these login banners also has the
@@ -970,9 +971,10 @@
 
 # We allow overwriting the default motd message (contained in files/templates/motd.j2) by a custom template, whose path
 # has to be defined in the variable "custom_motd_file_path".
+# 1.7.4 Ensure permissions on /etc/motd are configured
 - block:
   - name: "1.7.1 Ensure message of the day is configured properly\n
-          1.7.4 Ensure permissions on /etc/motd are configured "
+          1.7.4 Ensure permissions on /etc/motd are configured"
     template:
       src: "{{ lookup('first_found', motd, errors='ignore') }}"
       dest: /etc/motd
@@ -980,7 +982,7 @@
       group: root
       mode: "u-x,go-wx"
   - name: "1.7.1 Ensure message of the day is configured properly\n
-          1.7.4 Ensure permissions on /etc/motd are configured  | Show templates used"
+           1.7.4 Ensure permissions on /etc/motd are configured  | Show templates used"
     debug:
       msg: "{{'custom file not found, using default' if 'files/templates/motd.j2' in lookup('first_found', motd, errors='warn') else 'Custom file found, using ' ~ custom_motd_file_path }}"
     run_once: true
@@ -994,18 +996,25 @@
     - level_1_workstation
     - 1.7.1
     - 1.7.4
-    -
+
 # 1.7.2 Ensure local login warning banner is configured properly
 # We allow overwriting the default local login message (contained in files/templates/issue.j2) by a custom template, whose path
 # has to be defined in the variable "custom_issue_file_path".
-- name: "1.7.2 Ensure local login warning banner is configured properly\n
-         1.7.5 Ensure permissions on /etc/issue are configured"
-  template:
-    src: "{{ lookup('first_found', issue, errors='ignore') }}"
-    dest: /etc/issue
-    owner: root
-    group: root
-    mode: "u-x,go-wx"
+# 1.7.5 Ensure permissions on /etc/issue are configured
+- block:
+  - name: "1.7.2 Ensure local login warning banner is configured properly\n
+           1.7.5 Ensure permissions on /etc/issue are configured"
+    template:
+      src: "{{ lookup('first_found', issue, errors='ignore') }}"
+      dest: /etc/issue
+      owner: root
+      group: root
+      mode: "u-x,go-wx"
+  - name: "1.7.2 Ensure local login warning banner is configured properly\n
+           1.7.5 Ensure permissions on /etc/issue are configured  | Show templates used"
+    debug:
+      msg: "{{'custom file not found, using default' if 'files/templates/issue.j2' in lookup('first_found', issue, errors='warn') else 'Custom file found, using ' ~ custom_issue_file_path }}"
+    run_once: true
   vars:
     - issue:
       - "{{ custom_issue_file_path }}"
@@ -1015,19 +1024,28 @@
     - level_1_server
     - level_1_workstation
     - 1.7.2
-    -
+    - 1.7.5
+
 # 1.7.3 Ensure remote login warning banner is configured properly
 # We allow overwriting the default remote login message (contained in files/templates/issue.net.j2) by a custom template, whose path
 # has to be defined in the variable "custom_issue_net_file_path".
-- name: "1.7.3 Ensure remote login warning banner is configured properly"
-  template:
-    src: "{{ lookup('first_found', issue_net, errors='ignore') }}"
-    dest: /etc/issue.net
-    owner: root
-    group: root
-    mode: "u-x,go-wx"
+# 1.7.6 Ensure permissions on /etc/issue.net are configured
+- block:
+  - name: "1.7.3 Ensure local remote warning banner is configured properly\n
+           1.7.6 Ensure permissions on /etc/issue.net are configured"
+    template:
+      src: "{{ lookup('first_found', issue_net, errors='ignore') }}"
+      dest: /etc/issue.net
+      owner: root
+      group: root
+      mode: "u-x,go-wx"
+  - name: "1.7.3 Ensure remote login warning banner is configured properly\n
+           1.7.6 Ensure permissions on /etc/issue.net are configured  | Show templates used"
+    debug:
+      msg: "{{'custom file not found, using default' if 'files/templates/issue.net.j2' in lookup('first_found', issue_net, errors='warn') else 'Custom file found, using ' ~ custom_issue_net_file_path }}"
+    run_once: true
   vars:
-    - issue:
+    - issue_net:
       - "{{ custom_issue_net_file_path }}"
       - "files/templates/isssue.net.j2"
   tags:
@@ -1035,18 +1053,6 @@
     - level_1_server
     - level_1_workstation
     - 1.7.3
-
-#The contents of the /etc/issue.net file are displayed to users prior to login for remote connections from configured services.
-- name: 1.7.6 Ensure permissions on /etc/issue.net are configured
-  ansible.builtin.file:
-    path: /etc/issue.net
-    owner: root
-    group: root
-    mode: "u-x,go-wx"
-  tags:
-    - section1
-    - level_1_server
-    - level_1_workstation
     - 1.7.6
 
 # 1.8 GNOME Display Manager
