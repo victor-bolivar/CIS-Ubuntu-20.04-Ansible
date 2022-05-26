@@ -1047,7 +1047,7 @@
   vars:
     - issue_net:
       - "{{ custom_issue_net_file_path }}"
-      - "files/templates/isssue.net.j2"
+      - "files/templates/issue.net.j2"
   tags:
     - section1
     - level_1_server
