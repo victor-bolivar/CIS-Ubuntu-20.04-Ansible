@@ -399,7 +399,7 @@
       with_items: "{{ output_6_2_7_files.stdout_lines }}"
       when:
         - fix_dot_file_permissions
-        - output_6_2_7_files | length > 0
+        - "'stdout_lines' in output_6_2_7_files"
         - not fix_dot_include_folders
     - name: 6.2.7 Ensure users' dot files and folders are not group or world writable | correct file permissions
       # files with go+w will be touched twice, as they figure twice in the filter result
@@ -409,7 +409,7 @@
       with_items: "{{ output_6_2_7_folders.stdout_lines }}"
       when:
         - fix_dot_file_permissions
-        - output_6_2_7_folders | length > 0
+        - "'stdout_lines' in output_6_2_7_folders"
         - fix_dot_include_folders
   tags:
     - section6
