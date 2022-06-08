@@ -247,6 +247,8 @@
         path: /etc/ufw/sysctl.conf
         regexp: '^(net.ipv4.conf.*.log_martians=1)$'
         replace: '# \g<1>'
+      # Shouldn't fail if target file doesn't exist
+      ignore_errors: yes
     - name: 3.3.4 Ensure suspicious packets are logged | restart ufw after changes in /etc/ufw/sysctl.conf
       service:
         name: ufw
