@@ -242,6 +242,19 @@
         sysctl -w net.ipv4.conf.all.log_martians=1
         sysctl -w net.ipv4.conf.default.log_martians=1
         sysctl -w net.ipv4.route.flush=1
+    - name: 3.3.4 Ensure suspicious packets are logged | remove flags from /etc/ufw/sysctl.conf
+      replace:
+        path: /etc/ufw/sysctl.conf
+        regexp: '^(net.ipv4.conf.*.log_martians=1)$'
+        replace: '# \g<1>'
+      # Shouldn't fail if target file doesn't exist
+      ignore_errors: yes
+    - name: 3.3.4 Ensure suspicious packets are logged | restart ufw after changes in /etc/ufw/sysctl.conf
+      service:
+        name: ufw
+        state: restarted
+      when: UFWEnable
+
   tags:
     - section3
     - level_1_server
