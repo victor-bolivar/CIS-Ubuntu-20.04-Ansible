@@ -245,7 +245,7 @@
     - name: 3.3.4 Ensure suspicious packets are logged | remove flags from /etc/ufw/sysctl.conf
       replace:
         path: /etc/ufw/sysctl.conf
-        regexp: '^(net.ipv4.conf.*.log_martians=1)$'
+        regexp: '^(net/ipv4/conf/.*/log_martians=.*)$'
         replace: '# \g<1>'
       # Shouldn't fail if target file doesn't exist
       ignore_errors: yes
