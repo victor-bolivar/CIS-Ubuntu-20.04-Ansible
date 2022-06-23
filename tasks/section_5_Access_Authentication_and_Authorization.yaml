@@ -503,11 +503,12 @@
     dest: /etc/ssh/sshd_config
     regexp: "^MaxSessions"
     line: "MaxSessions {{ ssh_max_sessions }}"
+  notify: sshd restart
   tags:
     - section5
     - level_1_server
     - level_1_workstation
-    - 5.3.21
+    - 5.3.22
 # 5.4 Configure PAM
 # 5.4.1 Ensure password creation requirements are configured
 # Strong passwords protect systems from being hacked through brute force methods.
