@@ -123,7 +123,7 @@
 - name: 6.1.10 Ensure no world writable files exist
   block:
     - name: 6.1.10 Ensure no world writable files exist | find files
-      shell: df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -0002 2> /dev/null && true || true
+      shell: df --local -P | awk '{if (NR!=1) print $6}' | sudo xargs -I '{}' find '{}' -xdev -type f -perm -0002 2> /dev/null && true || true
       register: output_6_1_10
     - name: 6.1.10 Ensure no world writable files exist | save output
       copy:
@@ -146,13 +146,13 @@
     - name: 6.1.11 Ensure no unowned files or directories exist | No skipped strings
       block:
         - name: 6.1.11 Ensure no unowned files or directories exist | Find
-          shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null && true || true
+          shell: df --local -P | awk {'if (NR!=1) print $6'} | sudo xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null && true || true
           register: output_6_1_11
       when: unowned_files_strings_to_skip == None
     - name: 6.1.11 Ensure no unowned files or directories exist | Skipping specified strings
       block:
         - name: 6.1.11 Ensure no unowned files or directories exist | Find
-          shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null | grep -v -e  $(echo "{{ unowned_files_strings_to_skip }}" |  sed 's/,/\\|/g') && true || true
+          shell: df --local -P | awk {'if (NR!=1) print $6'} | sudo xargs -I '{}' find '{}' -xdev -nouser 2> /dev/null | grep -v -e  $(echo "{{ unowned_files_strings_to_skip }}" |  sed 's/,/\\|/g') && true || true
           register: output_6_1_11
       when: unowned_files_strings_to_skip != None
     - name: 6.1.11 Ensure no unowned files or directories exist | Save output
@@ -174,7 +174,7 @@
 - name: 6.1.12 Ensure no ungrouped files or directories exist
   block:
     - name: 6.1.12 Ensure no ungrouped files or directories exist | Find
-      shell: df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -nogroup 2> /dev/null && true || true
+      shell: df --local -P | awk '{if (NR!=1) print $6}' | sudo xargs -I '{}' find '{}' -xdev -nogroup 2> /dev/null && true || true
       register: output_6_1_12
     - name: 6.1.12 Ensure no ungrouped files or directories exist | Save output
       copy:
@@ -195,7 +195,7 @@
 - name: 6.1.13 Audit SUID executables
   block:
     - name: 6.1.13 Audit SUID executables | find
-      shell: df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -4000 2> /dev/null && true || true
+      shell: df --local -P | awk '{if (NR!=1) print $6}' | sudo xargs -I '{}' find '{}' -xdev -type f -perm -4000 2> /dev/null && true || true
       register: output_6_1_13
     - name: 6.1.13 Audit SUID executables | save output
       copy:
@@ -216,7 +216,7 @@
 - name: 6.1.14 Audit SGID executables
   block:
     - name: 6.1.14 Audit SGID executables | find
-      shell: df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -2000 2> /dev/null && true || true
+      shell: df --local -P | awk '{if (NR!=1) print $6}' | sudo xargs -I '{}' find '{}' -xdev -type f -perm -2000 2> /dev/null && true || true
       register: output_6_1_14
     - name: 6.1.14 Audit SGID executables | save output
       copy:
