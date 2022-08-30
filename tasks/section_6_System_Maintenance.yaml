@@ -498,22 +498,22 @@
     - name: 6.2.12 Ensure root PATH Integrity | run | Delete non-existing folders from PATH
       block:
       - name: 6.2.12 Ensure root PATH Integrity | run | Delete non-existing folders from PATH
-        script: 6_2_3_delete_nonexisting.sh
-        register: output_6_2_3
-      when: path_integrity_delete_nonexisting_paths
+        script: 6_2_12_delete_nonexisting.sh
+        register: output_6_2_12
+      when: root_path_delete_nonexisting_paths
     - name: 6.2.12 Ensure root PATH Integrity | run
       block:
       - name: 6.2.12 Ensure root PATH Integrity | run
-        script: 6_2_3.sh
-        register: output_6_2_3
-      when: not path_integrity_delete_nonexisting_paths
+        script: 6_2_12.sh
+        register: output_6_2_12
+      when: not root_path_delete_nonexisting_paths
     - name: 6.2.12 Ensure root PATH Integrity | run
-      script: 6_2_3.sh
-      register: output_6_2_3
+      script: 6_2_12.sh
+      register: output_6_2_12
     - name: 6.2.12 Ensure root PATH Integrity | save output
       copy:
         dest: "{{ outputfiles }}/6.2.12"
-        content: "{{ output_6_2_3 }}"
+        content: "{{ output_6_2_12 }}"
   tags:
     - section6
     - level_1_server

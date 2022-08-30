@@ -6,6 +6,7 @@ if echo $PATH | grep -q ":$"; then
     echo "Trailing : in PATH"
 fi
 for x in $(echo $PATH | tr ":" " "); do
+    echo "Working on $x"
     if [ -d "$x" ]; then
         ls -ldH "$x" | awk '
 $9 == "." {print "PATH contains current working directory (.)"}
@@ -16,7 +17,9 @@ substr($1,9,1) != "-" {print $9, "is world writable"}'
         if [ -f "$x" ]; then
             echo "$x is a file and not a directory"
         else
+            echo "$x is nor a directory neither a file"
             newpath=$(echo "$PATH" |sed -e "s#\(^\|:\)$(echo "$x" |sed -e 's/[^^]/[&]/g' -e 's/\^/\\^/g')\(:\|/\{0,1\}$\)#\1\2#" -e 's#:\+#:#g' -e 's#^:\|:$##g')
-            sed -i 's%PATH=.*%PATH="'$(echo $newpath)'"%'"" /etc/environment
-    fi
+            sed -i  's%PATH=.*%PATH="'$(echo $newpath)'"%'"" /etc/environment
+        fi
+   fi
 done

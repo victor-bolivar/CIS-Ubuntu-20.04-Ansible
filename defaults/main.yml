@@ -181,4 +181,4 @@ unowned_files_strings_to_skip: None #Allows for skipping certain strings in the 
 fix_dot_file_permissions: yes
 fix_dot_include_folders: false # Include folders as well as files
 ## 6.2.12 Ensure root PATH Integrity
-path_integrity_delete_nonexisting_paths: false # Deletes paths that are neither files nor folders from /etc/environment
+root_path_delete_nonexisting_paths: false # Deletes paths that are neither files nor folders from /etc/environment
