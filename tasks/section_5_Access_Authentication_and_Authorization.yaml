@@ -754,42 +754,42 @@
     - 5.5.3
 # 5.5.4 Ensure default user umask is 027 or more restrictive
 # # # # Setting a very secure default value for umask ensures that users make a conscious choice about their file permissions. A default umask setting of 077 causes files and directories created by users to not be readable by any other user on the system. A umask of 027 would make files and directories readable by users in the same Unix group, while a umask of 022 would make files readable by every user on the system.
-- name: 5.5.4 Ensure default user umask is 027 or more restrictive
+- name: 5.5.4 Ensure default user umask is {{ umask_value | default('027') }} or more restrictive
   block:
-    - name: 5.5.4 Ensure default user umask is 027 or more restrictive | /etc/login.defs
+    - name: 5.5.4 Ensure default user umask is {{ umask_value | default('027') }} or more restrictive | /etc/login.defs
       lineinfile:
         state: present
         dest: /etc/login.defs
         regexp: '^UMASK\s'
-        line: "UMASK 027"
+        line: "UMASK {{ umask_value | default('027') }}"
         mode: "0666"
-    - name: 5.5.4 Ensure default user umask is 027 or more restrictive  | /etc/pam.d/common-session
+    - name: 5.5.4 Ensure default user umask is {{ umask_value | default('027') }} or more restrictive  | /etc/pam.d/common-session
       lineinfile:
         dest: /etc/pam.d/common-session
         regexp: '^session optional\s+'
         line: "session optional  pam_umask.so"
-    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - /etc/bash.bashrc
+    - name: 5.5.4 Ensure default user umask is {{ umask_value | default('027') }} or more restrictive - /etc/bash.bashrc
       lineinfile:
         state: present
         dest: /etc/bash.bashrc
         create: true
         regexp: "^umask "
-        line: "umask 027"
-    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - /etc/profile
+        line: "umask {{ umask_value | default('027') }}"
+    - name: 5.5.4 Ensure default user umask is {{ umask_value | default('027') }} or more restrictive - /etc/profile
       lineinfile:
         state: present
         dest: /etc/profile
         create: true
         regexp: "^umask "
-        line: "umask 027"
-    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - /etc/profile.d/umask.sh
+        line: "umask {{ umask_value | default('027') }}"
+    - name: 5.5.4 Ensure default user umask is {{ umask_value | default('027') }} or more restrictive - /etc/profile.d/umask.sh
       lineinfile:
         state: present
         dest: /etc/profile.d/umask.sh
         create: true
         regexp: "^umask "
-        line: "umask 027"
-    - name: 5.5.4 Ensure default user umask is 027 or more restrictive - Fix for /etc/apt/apt.conf.d/50command-not-found
+        line: "umask {{ umask_value | default('027') }}"
+    - name: 5.5.4 Ensure default user umask is {{ umask_value | default('027') }} or more restrictive - Fix for /etc/apt/apt.conf.d/50command-not-found
       lineinfile:
         state: present
         dest: /etc/apt/apt.conf.d/50command-not-found
