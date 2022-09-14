@@ -155,6 +155,12 @@ account_inactive: 30
 ## 5.4.5 Ensure default user shell timeout is 900 seconds or less
 shell_timeout_sec: 900
 ## 5.5.4 Ensure default user umask is 027 or more restrictive
+umask_value: 027 # Adds the option to declare the umask preferred value, with 027 as default
+## In some particular use cases (e.g. installing and using new python packages after 
+## hardening), it is required that umask permissions were not as strict as 
+## 027, because the system will not be able to run the newer python packages. 
+## In those cases, it would be better to be able to set the 
+## default umask permissions needed for the use case.
 fix_command_not_found: false # Adds a change to /etc/apt/apt.conf.d/50command-not-found to fix a known issue.
 ## Note: Issue link for fix_command_not_found https://bugs.launchpad.net/command-not-found/+bug/1824000/
 
