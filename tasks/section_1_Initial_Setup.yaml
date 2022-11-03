@@ -11,7 +11,17 @@
 #       fail:
 #         msg: "Exiting: Change root_password from r00tP4ssw0rd in defaults/main.yml"
 #   when: set_root_password and root_password is match ("r00tP4ssw0rd")
-  
+
+- name: 1.0 Pre-emptively run an 'apt update', so that future 'apt' invocations don't need to do it anymore
+  apt:
+    force_apt_get: yes
+    update_cache: yes
+  tags:
+    - section1
+    - level_1_server
+    - level_1_workstation
+    - "1.0"
+
 # 1.1.1 Disable unused filesystems
 # 1.1.1.1 Ensure mounting of cramfs filesystems is disabled
 # Removing support for unneeded filesystem types reduces the local attack surface of the
