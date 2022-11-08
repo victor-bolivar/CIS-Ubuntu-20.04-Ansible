@@ -371,6 +371,7 @@
         dest: /etc/ssh/sshd_config
         regexp: "^[Mm]atch [Aa]ddress.*\n*PermitRootLogin.*"
         line: "Match address {{ ssh_root_login_ips }}\n PermitRootLogin yes"
+        insertafter: "EOF"
       when: (ssh_root_login_ips != "None") and (ssh_root_login_ips|length > 0)
   tags:
   - section5
