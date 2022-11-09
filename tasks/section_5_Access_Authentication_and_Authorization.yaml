@@ -364,14 +364,12 @@
     - name: "5.3.10 Ensure SSH root login is disabled: remove root login for all existing IPs"
       replace:
         dest: /etc/ssh/sshd_config
-        regexp: "^[Mm]atch [Aa]ddress.*\n.*PermitRootLogin.*$"
+        regexp: "^[Mm]atch [Aa]ddress.*\n[ ]*PermitRootLogin.*(\n[Mm]atch [Aa]ll[ ]*)?\n"
     - name: "5.3.10 Ensure SSH root login is disabled: allow ssh root login from '{{ ssh_root_login_ips }}'"
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
-        regexp: "^[Mm]atch [Aa]ddress.*\n*PermitRootLogin.*"
-        line: "Match address {{ ssh_root_login_ips }}\n PermitRootLogin yes"
-        insertafter: "EOF"
+        line: "Match Address {{ ssh_root_login_ips }}\n  PermitRootLogin yes\nMatch All"
       when: (ssh_root_login_ips != "None") and (ssh_root_login_ips|length > 0)
   tags:
   - section5
