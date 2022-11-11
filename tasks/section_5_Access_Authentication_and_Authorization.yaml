@@ -559,7 +559,9 @@
   block:
     - name: 5.4.1 Ensure password creation requirements are configured
       apt:
-        name: libpam-pwquality
+        name:
+          - libpam-pwquality
+          - cracklib-runtime
         state: present
         install_recommends: false
     - name: 5.4.1 Ensure password creation requirements are configured
