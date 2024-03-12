@@ -855,14 +855,12 @@
 # Since the system console has special properties to handle emergency situations, it is important to ensure that the console is in a physically secure location and that unauthorized consoles have not been defined.
 - name: 5.6 Ensure root login is restricted to system console
   block:
-    - name: 5.6 Ensure root login is restricted to system console | check file
-      stat:
-        path: /etc/securetty
-      register: securetty
-    - name: 5.6 Ensure root login is restricted to system console | save output
+    - name: 5.6 Ensure root login is restricted to system console | creates /etc/securetty if it doesn't exist and ensures that 'console' is its only content
       copy:
-        dest: "{{ outputfiles }}/5.6"
-        content: "{{ securetty }}"
+        content: "console"
+        force: true
+        dest: "/etc/securetty"
+        mode: '0600'
   ignore_errors: yes
   tags:
     - section5
