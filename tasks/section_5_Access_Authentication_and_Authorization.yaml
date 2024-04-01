@@ -586,6 +586,13 @@
 # Locking out user IDs after n unsuccessful consecutive login attempts mitigates brute force password attacks against your systems.
 - name: 5.4.2 Ensure lockout for failed password attempts is configured
   block:
+    # This line has to be set before enabling user lockout to prevent successful logins from being counted as failures,
+    # therefore ensuring the playbook execution isn't interrupted in case of simultaneaous logins
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_tally2.so
+      lineinfile:
+        dest: /etc/pam.d/common-account
+        regexp: '^account\srequired'
+        line: "account required pam_tally2.so"
     - name: 5.4.2 Ensure lockout for failed password attempts is configured | common-auth
       lineinfile:
         dest: /etc/pam.d/common-auth
@@ -595,11 +602,6 @@
         dest: /etc/pam.d/common-account
         regexp: '^account\srequisite'
         line: "account requisite pam_deny.so"
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_tally2.so
-      lineinfile:
-        dest: /etc/pam.d/common-account
-        regexp: '^account\srequired'
-        line: "account required pam_tally2.so"
   tags:
     - section5
     - level_1_server
