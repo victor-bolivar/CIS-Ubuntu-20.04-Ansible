@@ -450,13 +450,13 @@
         state: present
         dest: /etc/ssh/sshd_config
         regexp: "^ClientAliveInterval"
-        line: "ClientAliveInterval 300"
+        line: "ClientAliveInterval {{ ssh_client_alive_interval }}"
     - name: 5.3.16 Ensure SSH Idle Timeout Interval is configured | MaxAlive
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
         regexp: "^ClientAliveCountMax"
-        line: "ClientAliveCountMax 3"
+        line: "ClientAliveCountMax {{ ssh_client_alive_count_max }}"
   tags:
     - section5
     - level_1_server
@@ -622,7 +622,7 @@
 - name: 5.4.3.2 Ensure password reuse is limited | update file according to CIS
   lineinfile:
     dest: /etc/pam.d/common-password
-    line: "password required pam_pwhistory.so remember=5"
+    line: "password required pam_pwhistory.so remember={{ password_remember }}"
     insertafter: '^password\s+?requisite.*'
     state: present
     firstmatch: true

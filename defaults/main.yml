@@ -146,6 +146,9 @@ ssh_max_startups: "10:30:100"
 ssh_max_sessions: 10
 ## 5.3.10 Allow root logins for a certain list of IPs (default: no root login allowed), e.g. "192.168.10.10,192.168.1.0/24"
 ssh_root_login_ips: None
+## 5.3.16 Ensure SSH Idle Timeout Interval is configured
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 3
 ## 5.4.1.1 Ensure password expiration is 365 days or less
 pass_expire_in_days: 300
 pass_warn_age: 7
@@ -156,6 +159,8 @@ list_of_os_users:
 ## 5.4.1.4 Ensure inactive password lock is 30 days or less
 ##Note: A value of -1 would disable this setting
 account_inactive: 30
+#5.4.3.2 Ensure password reuse is limited | update file according to CIS
+password_remember: 5
 ## 5.4.5 Ensure default user shell timeout is 900 seconds or less
 shell_timeout_sec: 900
 ## 5.5.4 Ensure default user umask is 027 or more restrictive
