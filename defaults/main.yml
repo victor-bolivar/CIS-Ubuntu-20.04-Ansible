@@ -12,7 +12,7 @@ disable_fat: yes
 temp_dir_size: 1G
 disable_squashfs: no #Disabling squashfs will prevent the use of snap
 # 1.1.24 Disable USB Storage | disables the kernel modules that are using usb storage
-disable_usb_kernel_modules: false
+disable_usb_kernel_modules: true
 # 1.4.1 Ensure permissions on bootloader config are not overridden
 protect_bootloader_permissions: true
 ## 1.4.2 Ensure bootloader password is set (using grub): default is no
