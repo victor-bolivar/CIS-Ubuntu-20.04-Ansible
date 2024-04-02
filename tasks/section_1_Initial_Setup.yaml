@@ -495,7 +495,7 @@
           loop: "{{ kernel_modules_using_usb.stdout.split(' ') | last | split(',') }}"
           # The last column of the 'lsmod | grep -i usb_storage' command is a comma separated list of the kernel modules that are using usb_storage
           when: kernel_modules_using_usb.stdout | length > 0
-      when: not disable_usb_kernel_modules
+      when: disable_usb_kernel_modules
 
     - name: 1.1.24 Disable USB Storage
       modprobe:
