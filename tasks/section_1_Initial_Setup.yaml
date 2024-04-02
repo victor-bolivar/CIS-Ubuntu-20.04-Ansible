@@ -482,6 +482,21 @@
         line: "install usb-storage /bin/true"
         state: present
         create: true
+      
+    - name: 1.1.24 Disable USB Storage | disables the kernel modules that are using usb storage
+      block:
+        - name: 1.1.24 Disable USB Storage | gets kernel modules that are using usb storage
+          shell: lsmod | grep -i usb_storage
+          # If grep cannot find the pattern, it will return 1 as its exit status which will cause the task to fail, hence the ignore_errors: true
+          ignore_errors: true
+          register: kernel_modules_using_usb
+        - name: 1.1.24 Disable USB Storage | disables the kernel modules that are using usb storage
+          command: "modprobe -r {{ item }} usb_storage"
+          loop: "{{ kernel_modules_using_usb.stdout.split() | last | split(',') }}"
+          # The last column of the 'lsmod | grep -i usb_storage' command is a comma separated list of the kernel modules that are using usb_storage
+          when: kernel_modules_using_usb.stdout | length > 0
+      when: not disable_usb_kernel_modules
+
     - name: 1.1.24 Disable USB Storage
       modprobe:
         name: usb-storage
