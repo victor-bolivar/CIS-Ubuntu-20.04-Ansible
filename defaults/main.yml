@@ -155,7 +155,7 @@ ssh_client_alive_count_max: 3
 ## 5.4.1 Ensure password creation requirements are configured
 pass_min_len: 14
 ## 5.5.1.2 Ensure password expiration is 365 days or less
-pass_expire_in_days: 300
+pass_expire_in_days: 365
 pass_warn_age: 7
 pass_min_days: 1
 ## 5.4.1.1 Ensure password expiration is 365 days or less
