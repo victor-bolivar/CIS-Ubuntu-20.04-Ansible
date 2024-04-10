@@ -572,7 +572,7 @@
         regexp: "^{{ item.key }}"
         line: "{{ item.key }} = {{ item.value }}"
       with_items:
-        - { key: "minlen", value: "14" }
+        - { key: "minlen", value: "{{ pass_min_len }}" }
         - { key: "dcredit", value: "-1" }
         - { key: "ucredit", value: "-1" }
         - { key: "ocredit", value: "-1" }
