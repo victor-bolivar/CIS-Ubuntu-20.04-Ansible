@@ -676,7 +676,7 @@
 
     - name: 5.5.1.1 Ensure minimum days between password changes is configured  | chage --mindays
       command: "chage --mindays {{ pass_min_days }} {{ item }}"
-      loop: "{{ list_of_os_users.split(' ') }}"
+      loop: "{{ list_of_os_users }}"
 
     - name: 5.5.1.2 Ensure password expiration is 365 days or less | PASS_MAX_DAYS
       lineinfile:
@@ -687,7 +687,7 @@
 
     - name: 5.5.1.2 Ensure password expiration is 365 days or less  | chage
       command: "chage --maxdays {{ pass_expire_in_days }} {{ item }}"
-      loop: "{{ list_of_os_users.split(' ') }}"
+      loop: "{{ list_of_os_users }}"
 
     - name: 5.5.1.3 Ensure password expiration warning days is 7 or more | PASS_WARN_AGE
       lineinfile:
@@ -698,7 +698,7 @@
 
     - name: 5.5.1.3 Ensure password expiration warning days is 7 or more  | chage --warndays
       command: "chage --warndays {{ pass_warn_age }} {{ item }}"
-      loop: "{{ list_of_os_users.split(' ') }}"
+      loop: "{{ list_of_os_users }}"
   ignore_errors: yes
   tags:
     - section5
