@@ -182,6 +182,8 @@ fix_command_not_found: false # Adds a change to /etc/apt/apt.conf.d/50command-no
 usersAllowedToSuAccess:
   - root
 adminGroup: root
+pam_d_su_template: files/templates/etc/pam-d-su.j2
+
 # Section 6
 
 # Section 6 settings

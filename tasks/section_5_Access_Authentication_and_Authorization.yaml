@@ -883,7 +883,7 @@
         mode: 0644
     - name: 5.7 Ensure access to the su command is restricted  | create pam-d-su
       template:
-        src: files/templates/etc/pam-d-su.j2
+        src: "{{ pam_d_su_template }}"
         dest: "/etc/pam.d/su"
         owner: root
         group: root
