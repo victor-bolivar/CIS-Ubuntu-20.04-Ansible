@@ -228,7 +228,7 @@
     - name: 6.1.14 Audit SGID executables | remove whitelisted SGID executables
       set_fact:
         filtered_sgid_executables: "{{ output_6_1_14.stdout_lines | difference(sgid_executables_whitelist) }}"
-    - name: 6.1.14 Audit SUID executables | fix
+    - name: 6.1.14 Audit SGID executables | fix
       file:
         path: "{{ item }}"
         mode: "-s"
