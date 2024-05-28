@@ -201,11 +201,14 @@
       copy:
         dest: "{{ outputfiles }}/6.1.13"
         content: "{{ output_6_1_13.stdout_lines }}"
-    # - name: 6.1.13 Audit SUID executables | fix
-    #   file:
-    #     path: "{{ item }}"
-    #     mode: "-s"
-    #   with_items: "{{ output_6_1_13.stdout_lines }}"
+    - name: 6.1.13 Audit SUID executables | filter out whitelisted SUID executables
+      set_fact:
+        filtered_suid_executables: "{{ output_6_1_13.stdout_lines | difference(suid_executables_whitelist) }}"
+    - name: 6.1.13 Audit SUID executables | fix
+      file:
+        path: "{{ item }}"
+        mode: "-s"
+      with_items: "{{ filtered_suid_executables }}"
   tags:
     - section6
     - level_1_server
@@ -222,11 +225,14 @@
       copy:
         dest: "{{ outputfiles }}/6.1.14"
         content: "{{ output_6_1_14.stdout_lines }}"
-    # - name: 6.1.14 Audit SGID executables | fix
-    #   file:
-    #     path: "{{ item }}"
-    #     mode: "-s"
-    #   with_items: "{{ output_6_1_14.stdout_lines }}"
+    - name: 6.1.14 Audit SGID executables | remove whitelisted SGID executables
+      set_fact:
+        filtered_sgid_executables: "{{ output_6_1_14.stdout_lines | difference(sgid_executables_whitelist) }}"
+    - name: 6.1.14 Audit SGID executables | fix
+      file:
+        path: "{{ item }}"
+        mode: "-s"
+      with_items: "{{ filtered_sgid_executables }}"
   tags:
     - section6
     - level_1_server
