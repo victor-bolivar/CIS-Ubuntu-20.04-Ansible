@@ -586,22 +586,38 @@
 # Locking out user IDs after n unsuccessful consecutive login attempts mitigates brute force password attacks against your systems.
 - name: 5.4.2 Ensure lockout for failed password attempts is configured
   block:
-    # This line has to be set before enabling user lockout to prevent successful logins from being counted as failures,
-    # therefore ensuring the playbook execution isn't interrupted in case of simultaneaous logins
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_tally2.so
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Check pam faillock is set
+      shell: grep -E "preauth|authfail|authsucc" /etc/pam.d/common-auth | grep pam_faillock.so
+      register: faillock_state
+      failed_when: faillock_state.rc not in [0, 1]
+      changed_when: false
+
+    ## Issues have been seen with this control that can't always be replicated
+    ## Please ensure you understand what this control is doing before overriding the current settings
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Set faillock in common-auth
+      replace:
+          path: /etc/pam.d/common-auth
+          before: .*pam_deny.so
+          regexp: .*pam_unix.so nullok
+          replace: "{{ pam_faillock_common_auth }}"
+      when: "'pam_faillock.so' not in faillock_state.stdout"
+
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Set faillock common-account
       lineinfile:
-        dest: /etc/pam.d/common-account
-        regexp: '^account\srequired'
-        line: "account required pam_tally2.so"
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured | common-auth
+          path: /etc/pam.d/common-account
+          regexp: '^account\s+required\s+pam_faillock.so'
+          line: 'account required              pam_faillock.so'
+
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Set pam_deny.so and pam_tally.so
       lineinfile:
-        dest: /etc/pam.d/common-auth
-        line: "auth required pam_tally2.so onerr=fail audit silent deny=5 unlock_time=900"
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_deny.so
-      lineinfile:
-        dest: /etc/pam.d/common-account
-        regexp: '^account\srequisite'
-        line: "account requisite pam_deny.so"
+          path: /etc/security/faillock.conf
+          regexp: "{{ item.regexp }}"
+          line: "{{ item.line }}"
+          insertafter: '^# end of pam-auth-update config'
+          create: true
+      loop:
+          - { regexp: '^deny', line: 'deny = 5' }
+          - { regexp: '^unlock_time', line: 'unlock_time = 900' }
   tags:
     - section5
     - level_1_server

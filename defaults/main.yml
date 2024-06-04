@@ -183,6 +183,11 @@ usersAllowedToSuAccess:
   - root
 adminGroup: root
 pam_d_su_template: files/templates/etc/pam-d-su.j2
+pam_faillock_common_auth: |
+  auth       required                                pam_faillock.so preauth
+  auth       [success=1 default=ignore]              pam_unix.so nullok
+  auth       [default=die]                           pam_faillock.so authfail
+  auth       sufficient                              pam_faillock.so authsucc
 
 # Section 6
 
