@@ -203,7 +203,10 @@
         content: "{{ output_6_1_13.stdout_lines }}"
     - name: 6.1.13 Audit SUID executables | filter out whitelisted SUID executables
       set_fact:
-        filtered_suid_executables: "{{ output_6_1_13.stdout_lines | difference(suid_executables_whitelist) }}"
+        filtered_suid_executables: >-
+          {{
+            output_6_1_13.stdout_lines | reject('search', '^((' + '|'.join(suid_executables_whitelist) + ')(/|$))') | list
+          }}
     - name: 6.1.13 Audit SUID executables | fix
       file:
         path: "{{ item }}"
@@ -227,7 +230,10 @@
         content: "{{ output_6_1_14.stdout_lines }}"
     - name: 6.1.14 Audit SGID executables | remove whitelisted SGID executables
       set_fact:
-        filtered_sgid_executables: "{{ output_6_1_14.stdout_lines | difference(sgid_executables_whitelist) }}"
+        filtered_sgid_executables: >-
+          {{
+            output_6_1_14.stdout_lines | reject('search', '^((' + '|'.join(sgid_executables_whitelist) + ')(/|$))') | list
+          }}
     - name: 6.1.14 Audit SGID executables | fix
       file:
         path: "{{ item }}"
