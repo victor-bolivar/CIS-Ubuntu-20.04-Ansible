@@ -592,8 +592,11 @@
       failed_when: faillock_state.rc not in [0, 1]
       changed_when: false
 
-    ## Issues have been seen with this control that can't always be replicated
-    ## Please ensure you understand what this control is doing before overriding the current settings
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Backup common-auth
+      copy:
+        src: /etc/pam.d/common-auth
+        dest: /etc/pam.d/common-auth.backup
+
     - name: 5.4.2 Ensure lockout for failed password attempts is configured | Set faillock in common-auth
       replace:
           path: /etc/pam.d/common-auth
@@ -601,6 +604,11 @@
           regexp: .*pam_unix.so nullok
           replace: "{{ pam_faillock_common_auth }}"
       when: "'pam_faillock.so' not in faillock_state.stdout"
+    
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Backup common-account
+      copy:
+        src: /etc/pam.d/common-account
+        dest: /etc/pam.d/common-account.backup
 
     - name: 5.4.2 Ensure lockout for failed password attempts is configured | Set faillock common-account
       lineinfile:
