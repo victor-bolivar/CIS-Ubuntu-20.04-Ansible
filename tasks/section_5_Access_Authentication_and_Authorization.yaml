@@ -586,22 +586,91 @@
 # Locking out user IDs after n unsuccessful consecutive login attempts mitigates brute force password attacks against your systems.
 - name: 5.4.2 Ensure lockout for failed password attempts is configured
   block:
-    # This line has to be set before enabling user lockout to prevent successful logins from being counted as failures,
-    # therefore ensuring the playbook execution isn't interrupted in case of simultaneaous logins
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_tally2.so
-      lineinfile:
-        dest: /etc/pam.d/common-account
-        regexp: '^account\srequired'
-        line: "account required pam_tally2.so"
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured | common-auth
-      lineinfile:
-        dest: /etc/pam.d/common-auth
-        line: "auth required pam_tally2.so onerr=fail audit silent deny=5 unlock_time=900"
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured | pam_deny.so
-      lineinfile:
-        dest: /etc/pam.d/common-account
-        regexp: '^account\srequisite'
-        line: "account requisite pam_deny.so"
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Get OS version
+      block:
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Read /etc/os-release
+        command: cat /etc/os-release
+        register: os_release
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Set fact for OS version
+        set_fact:
+          os_version: "{{ (os_release.stdout | regex_search('VERSION_ID=\"([^\"]+)\"', '\\1')) | first }}"
+    
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 20.04
+      block:
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 20.04 | Backup common-account
+        copy:
+          src: /etc/pam.d/common-account
+          dest: /etc/pam.d/common-account.backup
+
+      # This line has to be set before enabling user lockout to prevent successful logins from being counted as failures,
+      # therefore ensuring the playbook execution isn't interrupted in case of simultaneaous logins
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 20.04 | pam_tally2.so
+        lineinfile:
+          dest: /etc/pam.d/common-account
+          regexp: '^account\srequired'
+          line: "account required pam_tally2.so"
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 20.04 | Backup common-auth
+        copy:
+          src: /etc/pam.d/common-auth
+          dest: /etc/pam.d/common-auth.backup
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 20.04 | common-auth
+        lineinfile:
+          dest: /etc/pam.d/common-auth
+          line: "auth required pam_tally2.so onerr=fail audit silent deny=5 unlock_time=900"
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 20.04 | pam_deny.so
+        lineinfile:
+          dest: /etc/pam.d/common-account
+          regexp: '^account\srequisite'
+          line: "account requisite pam_deny.so"
+      when: os_version == "20.04"
+
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 22.04
+      block:
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 22.04 | Check pam faillock is set
+        shell: grep -E "preauth|authfail|authsucc" /etc/pam.d/common-auth | grep pam_faillock.so
+        register: faillock_state
+        failed_when: faillock_state.rc not in [0, 1]
+        changed_when: false
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 22.04 | Backup common-auth
+        copy:
+          src: /etc/pam.d/common-auth
+          dest: /etc/pam.d/common-auth.backup
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 22.04 | Set faillock in common-auth
+        replace:
+          path: /etc/pam.d/common-auth
+          before: .*pam_deny.so
+          regexp: .*pam_unix.so nullok
+          replace: "{{ pam_faillock_common_auth }}"
+        when: "'pam_faillock.so' not in faillock_state.stdout"
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 22.04 | Backup common-account
+        copy:
+          src: /etc/pam.d/common-account
+          dest: /etc/pam.d/common-account.backup
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 22.04 | Set faillock common-account
+        lineinfile:
+          path: /etc/pam.d/common-account
+          regexp: '^account\s+required\s+pam_faillock.so'
+          line: 'account required              pam_faillock.so'
+
+      - name: 5.4.2 Ensure lockout for failed password attempts is configured | Ubuntu 22.04 | Set pam_deny.so and pam_tally.so
+        lineinfile:
+          path: /etc/security/faillock.conf
+          regexp: "{{ item.regexp }}"
+          line: "{{ item.line }}"
+          insertafter: '^# end of pam-auth-update config'
+          create: true
+        loop:
+          - { regexp: '^deny', line: 'deny = 5' }
+          - { regexp: '^unlock_time', line: 'unlock_time = 900' }
+      when: os_version == "22.04"
   tags:
     - section5
     - level_1_server
